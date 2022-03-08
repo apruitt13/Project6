@@ -46,6 +46,7 @@ ENDM
   enterNum			byte	"Please enter a signed number: ", 10, 13, 0
   wrongNum			byte	"ERROR: You did not enter a signed number or your number was too big.", 13, 10
 					byte	"Please try again: ", 13, 10, 0
+  stringLen			dword	?	
 
   
 
