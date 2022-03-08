@@ -11,7 +11,13 @@ TITLE Project 6     (Proj6_pruittad.asm)
 INCLUDE Irvine32.inc
 
 ; Macros
-  mGetString
+  mGetString macro numPrompt
+
+  PUSH  EAX
+  MOV   EDX, numPrompt
+  CALL  WriteString
+  POP   EAX
+ENDM
   ; Needs to display a prompt by reference. 
 
   ; Check that the user's entry is within the length that can be accepted and that it has only numbers.
@@ -19,39 +25,90 @@ INCLUDE Irvine32.inc
   ; Accept the user's number entry and store it in a memory location. Output parameter by reference.
 
 
-  mDisplayString
+ ; mDisplayString macro
 
   ; Needs to print the string which is stored in a specific memory by reference.
 
   
 
 ; (insert constant definitions here)
+  ARRAYSIZE = 5
 
 .data
+ 
+  randArray			dword	ARRAYSIZE DUP(?)
 
-; (insert variable definitions here)
+  intro1			byte	"PROGRAMMING ASSIGNMENT 6: Designing low-level I/O procedures", 13, 10
+					byte	"Written by: Sheperd Cooper", 13, 10, 13, 10
+					byte	"Please provide 10 signed decimal integers.", 13, 10
+					byte	"Each number needs to be small enough to fit inside a 32 bit register. After you have finished inputting", 13, 10
+					byte	"the raw numbers I will display a list of the integers, their sum, and their average value.", 13, 10, 13, 10, 0
+  enterNum			byte	"Please enter a signed number: ", 10, 13, 0
+  wrongNum			byte	"ERROR: You did not enter a signed number or your number was too big.", 13, 10
+					byte	"Please try again: ", 13, 10, 0
+
+  
+
+
 
 .code
 main PROC
+
+push	offset intro1
+call	Intro
+
 
 ; Implement two procedures for signed integers which useing string primitive directions.
 
 ; Needs a loop counter for 10.
 
-call ReadVal
+;call ReadVal
 ; Uses the mGetString to get the user inpus in the form of a string of digits.
 ; Converts the the ascii digits to its numeric value representation (SDWORD).
 ; Needs to validate that the user's input is a valid number.
 ; Store it in a list.
 
 
-call WriteVal
+;call WriteVal
 ; Convert the number to a string of ascii digits.
 ; Invoke the mDisplayString macro to print the ASCII represntation of the SDWORD value.
 
 	Invoke ExitProcess,0	; exit to operating system
 main ENDP
 
-; (insert additional procedures here)
+
+;----------------------------------------------------------------------------------------------------
+; Name: intro
+;
+; Displays the introduction 
+;
+; Preconditions: The only preconditions are that the variables need to be pushed onto the stack in
+; the correct order.
+;
+; Postconditions: EDX changed.
+;
+; Receives: 
+;	
+; 
+; Returns: None
+;----------------------------------------------------------------------------------------------------
+
+Intro	Proc
+  PUSH	EBP						; Preserve EBP
+  mov	EBP, ESP				; Assign static stack-fram pointer.
+
+  mov	edx, [ebp+8]
+  call	WriteString				; Prints intro1.
+
+
+  pop	EBP						; Restore EBP.
+  RET	4
+intro	ENDP
+
+
+
+
+
 
 END main
+

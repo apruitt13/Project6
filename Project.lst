@@ -1,16 +1,16 @@
-Microsoft (R) Macro Assembler Version 14.29.30138.0	    01/08/22 12:19:15
-#Program Template     (template.asm			     Page 1 - 1
+Microsoft (R) Macro Assembler Version 14.29.30140.0	    03/07/22 21:22:03
+"Project 6     (Proj6_pruittad.asm			     Page 1 - 1
 
 
-				TITLE Program Template     (template.asm)
+				TITLE Project 6     (Proj6_pruittad.asm)
 
-				; Author: 
-				; Last Modified:
-				; OSU email address: ONID_ID@oregonstate.edu
-				; Course number/section:   CS271 Section ???
-				; Project Number:                 Due Date:
-				; Description: This file is provided as a template from which you may work
-				;              when developing assembly projects in CS271.
+				; Author: Adam Pruitt
+				; Last Modified: 3/13/22
+				; OSU email address: pruittad@oregonstate.edu
+				; Course number/section:   CS271 Section 401
+				; Project Number:     6            Due Date: 3/13/22
+				; Description: This is a program that has asks a user for 10 signed decinal integers. It will then take those integers and print them out, add them and find the average.
+				; This program however can only use macros to get the string of numbers, convert them to integers, and print them out as strings.
 
 				INCLUDE Irvine32.inc
 			      C ; Include file for Irvine32.lib             (Irvine32.inc)
@@ -31,29 +31,173 @@ Microsoft (R) Macro Assembler Version 14.29.30138.0	    01/08/22 12:19:15
 			      C .LIST
 			      C 
 
-				; (insert macro definitions here)
+				; Macros
+				  ;mGetString macro 
+				  ; Needs to display a prompt by reference. 
+
+				  ; Check that the user's entry is within the length that can be accepted and that it has only numbers.
+
+				  ; Accept the user's number entry and store it in a memory location. Output parameter by reference.
+
+
+				 ; mDisplayString macro
+
+				  ; Needs to print the string which is stored in a specific memory by reference.
+
+				  
 
 				; (insert constant definitions here)
+ = 00000005			  ARRAYSIZE = 5
 
  00000000			.data
+				 
+ 00000000  00000005 [		  randArray			dword	ARRAYSIZE DUP(?)
+	    00000000
+	   ]
 
-				; (insert variable definitions here)
+ 00000014 50 52 4F 47 52	  intro1			byte	"PROGRAMMING ASSIGNMENT 6: Designing low-level I/O procedures", 13, 10
+	   41 4D 4D 49 4E
+	   47 20 41 53 53
+	   49 47 4E 4D 45
+	   4E 54 20 36 3A
+	   20 44 65 73 69
+	   67 6E 69 6E 67
+	   20 6C 6F 77 2D
+	   6C 65 76 65 6C
+	   20 49 2F 4F 20
+	   70 72 6F 63 65
+	   64 75 72 65 73
+	   0D 0A
+ 00000052  57 72 69 74 74						byte	"Written by: Sheperd Cooper", 13, 10, 13, 10
+	   65 6E 20 62 79
+	   3A 20 53 68 65
+	   70 65 72 64 20
+	   43 6F 6F 70 65
+	   72 0D 0A 0D 0A
+ 00000070  50 6C 65 61 73						byte	"Please provide 10 signed decimal integers.", 13, 10
+	   65 20 70 72 6F
+	   76 69 64 65 20
+	   31 30 20 73 69
+	   67 6E 65 64 20
+	   64 65 63 69 6D
+	   61 6C 20 69 6E
+	   74 65 67 65 72
+	   73 2E 0D 0A
+ 0000009C  45 61 63 68 20						byte	"Each number needs to be small enough to fit inside a 32 bit register. After you have finished inputting", 13, 10
+	   6E 75 6D 62 65
+	   72 20 6E 65 65
+	   64 73 20 74 6F
+	   20 62 65 20 73
+	   6D 61 6C 6C 20
+	   65 6E 6F 75 67
+	   68 20 74 6F 20
+	   66 69 74 20 69
+	   6E 73 69 64 65
+	   20 61 20 33 32
+	   20 62 69 74 20
+	   72 65 67 69 73
+	   74 65 72 2E 20
+	   41 66 74 65 72
+	   20 79 6F 75 20
+	   68 61 76 65 20
+	   66 69 6E 69 73
+	   68 65 64 20 69
+	   6E 70 75 74 74
+	   69 6E 67 0D 0A
+ 00000105  74 68 65 20 72						byte	"the raw numbers I will display a list of the integers, their sum, and their average value.", 13, 10, 13, 10, 0
+	   61 77 20 6E 75
+	   6D 62 65 72 73
+	   20 49 20 77 69
+	   6C 6C 20 64 69
+	   73 70 6C 61 79
+	   20 61 20 6C 69
+	   73 74 20 6F 66
+	   20 74 68 65 20
+	   69 6E 74 65 67
+	   65 72 73 2C 20
+	   74 68 65 69 72
+	   20 73 75 6D 2C
+	   20 61 6E 64 20
+	   74 68 65 69 72
+	   20 61 76 65 72
+	   61 67 65 20 76
+	   61 6C 75 65 2E
+	   0D 0A 0D 0A 00
+ 00000164 50 6C 65 61 73	  enterNum			byte	"Please enter a signed number: ", 10, 13, 0
+	   65 20 65 6E 74
+	   65 72 20 61 20
+	   73 69 67 6E 65
+	   64 20 6E 75 6D
+	   62 65 72 3A 20
+	   0A 0D 00
+ 00000185 45 52 52 4F 52	  wrongNum			byte	"ERROR: You did not enter a signed number or your number was too big.", 13, 10
+	   3A 20 59 6F 75
+	   20 64 69 64 20
+	   6E 6F 74 20 65
+	   6E 74 65 72 20
+	   61 20 73 69 67
+	   6E 65 64 20 6E
+	   75 6D 62 65 72
+	   20 6F 72 20 79
+	   6F 75 72 20 6E
+	   75 6D 62 65 72
+	   20 77 61 73 20
+	   74 6F 6F 20 62
+	   69 67 2E 0D 0A
+ 000001CB  50 6C 65 61 73						byte	"Please try again: ", 13, 10, 0
+	   65 20 74 72 79
+	   20 61 67 61 69
+	   6E 3A 20 0D 0A
+	   00
+
+				  
+
+
 
  00000000			.code
  00000000			main PROC
 
-				; (insert executable instructions here)
+ 00000000  68 00000014 R	push	offset intro1
+ 00000005  E8 00000007		call	Intro
+
+
+				; Implement two procedures for signed integers which useing string primitive directions.
+
+				; Needs a loop counter for 10.
+
+				;call ReadVal
+				; Uses the mGetString to get the user inpus in the form of a string of digits.
+				; Converts the the ascii digits to its numeric value representation (SDWORD).
+				; Needs to validate that the user's input is a valid number.
+				; Store it in a list.
+
+
+				;call WriteVal
+				; Convert the number to a string of ascii digits.
+				; Invoke the mDisplayString macro to print the ASCII represntation of the SDWORD value.
 
 					Invoke ExitProcess,0	; exit to operating system
- 00000000  6A 00	   *	    push   +000000000h
- 00000002  E8 00000000 E   *	    call   ExitProcess
- 00000007			main ENDP
+ 0000000A  6A 00	   *	    push   +000000000h
+ 0000000C  E8 00000000 E   *	    call   ExitProcess
+ 00000011			main ENDP
 
-				; (insert additional procedures here)
+
+
+ 00000011			Intro	Proc
+ 00000011  55			  PUSH	EBP						; Preserve EBP
+ 00000012  8B EC		  mov	EBP, ESP				; Assign static stack-fram pointer.
+
+ 00000014  8B 55 08		  mov		edx, [ebp+8]
+ 00000017  E8 00000000 E	  call		WriteString				; Prints intro1.
+
+
+ 0000001C  5D			  pop	EBP						; Restore EBP.
+ 0000001D  C2 0004		  RET	4
+ 00000020			intro	ENDP
 
 				END main
-Microsoft (R) Macro Assembler Version 14.29.30138.0	    01/08/22 12:19:15
-#Program Template     (template.asm			     Symbols 2 - 1
+Microsoft (R) Macro Assembler Version 14.29.30140.0	    03/07/22 21:22:03
+"Project 6     (Proj6_pruittad.asm			     Symbols 2 - 1
 
 
 
@@ -146,8 +290,8 @@ Segments and Groups:
 
 FLAT . . . . . . . . . . . . . .	GROUP
 STACK  . . . . . . . . . . . . .	32 Bit	 00001000 Para	  Stack	  'STACK'	 
-_DATA  . . . . . . . . . . . . .	32 Bit	 00000000 Para	  Public  'DATA'	
-_TEXT  . . . . . . . . . . . . .	32 Bit	 00000007 Para	  Public  'CODE'	
+_DATA  . . . . . . . . . . . . .	32 Bit	 000001E0 Para	  Public  'DATA'	
+_TEXT  . . . . . . . . . . . . .	32 Bit	 00000020 Para	  Public  'CODE'	
 
 
 Procedures, parameters, and locals:
@@ -193,6 +337,7 @@ HeapCreate . . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External
 HeapDestroy  . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
 HeapFree . . . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
 HeapSize . . . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
+Intro  . . . . . . . . . . . . .	P Near	 00000011 _TEXT	Length= 0000000F Public STDCALL
 IsDigit  . . . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
 LocalFree  . . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
 MessageBoxA  . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
@@ -254,7 +399,7 @@ WriteStackFrame  . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External
 WriteString  . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
 WriteToFile  . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
 WriteWindowsMsg  . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
-main . . . . . . . . . . . . . .	P Near	 00000000 _TEXT	Length= 00000007 Public STDCALL
+main . . . . . . . . . . . . . .	P Near	 00000000 _TEXT	Length= 00000011 Public STDCALL
 printf . . . . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External C
 scanf  . . . . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External C
 wsprintfA  . . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External C
@@ -274,6 +419,7 @@ Symbols:
 @fardata . . . . . . . . . . . .	Text   	 FLAT
 @stack . . . . . . . . . . . . .	Text   	 FLAT
 ALT_MASK . . . . . . . . . . . .	Number	 00000003h   
+ARRAYSIZE  . . . . . . . . . . .	Number	 00000005h   
 CAPSLOCK_ON  . . . . . . . . . .	Number	 00000080h   
 CREATE_ALWAYS  . . . . . . . . .	Number	 00000002h   
 CREATE_NEW . . . . . . . . . . .	Number	 00000001h   
@@ -477,9 +623,11 @@ black  . . . . . . . . . . . . .	Number	 00000000h
 blue . . . . . . . . . . . . . .	Number	 00000001h   
 brown  . . . . . . . . . . . . .	Number	 00000006h   
 cyan . . . . . . . . . . . . . .	Number	 00000003h   
+enterNum . . . . . . . . . . . .	Byte	 00000164 _DATA	
 exit . . . . . . . . . . . . . .	Text   	 INVOKE ExitProcess,0
 gray . . . . . . . . . . . . . .	Number	 00000008h   
 green  . . . . . . . . . . . . .	Number	 00000002h   
+intro1 . . . . . . . . . . . . .	Byte	 00000014 _DATA	
 lightBlue  . . . . . . . . . . .	Number	 00000009h   
 lightCyan  . . . . . . . . . . .	Number	 0000000Bh   
 lightGray  . . . . . . . . . . .	Number	 00000007h   
@@ -487,8 +635,10 @@ lightGreen . . . . . . . . . . .	Number	 0000000Ah
 lightMagenta . . . . . . . . . .	Number	 0000000Dh   
 lightRed . . . . . . . . . . . .	Number	 0000000Ch   
 magenta  . . . . . . . . . . . .	Number	 00000005h   
+randArray  . . . . . . . . . . .	DWord	 00000000 _DATA	
 red  . . . . . . . . . . . . . .	Number	 00000004h   
 white  . . . . . . . . . . . . .	Number	 0000000Fh   
+wrongNum . . . . . . . . . . . .	Byte	 00000185 _DATA	
 wsprintf . . . . . . . . . . . .	Text   	 wsprintfA
 yellow . . . . . . . . . . . . .	Number	 0000000Eh   
 
