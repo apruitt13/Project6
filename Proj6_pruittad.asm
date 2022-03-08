@@ -25,21 +25,23 @@ ENDM
   ; Accept the user's number entry and store it in a memory location. Output parameter by reference.
 
 
- ; mDisplayString macro
+  mDisplayString macro string
+	push	EAX
+	call	WriteString					; Prints whatever string is passed to it.
+	pop		EAX
+  ENDM
 
-  ; Needs to print the string which is stored in a specific memory by reference.
-
-  
 
 ; (insert constant definitions here)
   ARRAYSIZE = 5
+  STRINGSIZE = 11
 
 .data
  
   randArray			dword	ARRAYSIZE DUP(?)
 
   intro1			byte	"PROGRAMMING ASSIGNMENT 6: Designing low-level I/O procedures", 13, 10
-					byte	"Written by: Sheperd Cooper", 13, 10, 13, 10
+					byte	"Written by: Adam Pruitt", 13, 10, 13, 10
 					byte	"Please provide 10 signed decimal integers.", 13, 10
 					byte	"Each number needs to be small enough to fit inside a 32 bit register. After you have finished inputting", 13, 10
 					byte	"the raw numbers I will display a list of the integers, their sum, and their average value.", 13, 10, 13, 10, 0
@@ -55,22 +57,32 @@ ENDM
 .code
 main PROC
 
-push	offset intro1
-call	Intro
+  push	offset intro1
+  call	Intro
 
+  mov	ecx, STRINGSIZE
+_getNumLoop:
 
-; Implement two procedures for signed integers which useing string primitive directions.
+  call	ReadVal
 
-; Needs a loop counter for 10.
-
-;call ReadVal
 ; Uses the mGetString to get the user inpus in the form of a string of digits.
 ; Converts the the ascii digits to its numeric value representation (SDWORD).
 ; Needs to validate that the user's input is a valid number.
 ; Store it in a list.
 
+  call WriteVal
 
-;call WriteVal
+  loop _getNumLoop
+
+; Implement two procedures for signed integers which useing string primitive directions.
+
+; Needs a loop counter for 10.
+
+
+
+
+
+
 ; Convert the number to a string of ascii digits.
 ; Invoke the mDisplayString macro to print the ASCII represntation of the SDWORD value.
 
@@ -99,17 +111,38 @@ Intro	Proc
   mov	EBP, ESP				; Assign static stack-fram pointer.
 
   mov	edx, [ebp+8]
-  call	WriteString				; Prints intro1.
-
+  mDisplayString edx			; Prints intro1.
 
   pop	EBP						; Restore EBP.
   RET	4
-intro	ENDP
+Intro	ENDP
 
 
 
+; 48 is the magic number for changing ascii to a number.
+ReadVal	Proc
+  PUSH	EBP						; Preserve EBP
+  mov	EBP, ESP				; Assign static stack-fram pointer.
 
 
+
+  pop	EBP						; Restore EBP.
+  RET	4						; Change this value to however much is pushed onto the stack before the procedure is called.
+
+ReadVal		ENDP
+
+
+
+WriteVal	Proc
+  PUSH	EBP						; Preserve EBP
+  mov	EBP, ESP				; Assign static stack-fram pointer.
+
+
+
+  pop	EBP						; Restore EBP.
+  RET	4						; Change this value to however much is pushed onto the stack before the procedure is called.
+
+WriteVal	ENDP
 
 END main
 
