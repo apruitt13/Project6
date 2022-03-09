@@ -11,12 +11,14 @@ TITLE Project 6     (Proj6_pruittad.asm)
 INCLUDE Irvine32.inc
 
 ; Macros
-  mGetString macro numPrompt, count, numEntered
+  mGetString macro numPrompt, count, numEntered, byteRead
 	mov		edx, numPrompt
 	call	WriteString
 	mov		edx, numEntered
 	mov		ecx, count
-	call	ReadString	
+	call	ReadString
+	mov		[numEntered], edx
+	mov		[byteRead], EAX
   
 ENDM
   ; Needs to display a prompt by reference. 
@@ -53,7 +55,7 @@ ENDM
 					byte	"Please try again: ", 13, 10, 0
   stringLen			dword	?	
   buffer			byte	21 DUP (0)
-  byteCount			dword	?
+  bytesRead			dword	?
   inString			byte	CHARACTERSIZE dup(?)
 
 
@@ -70,30 +72,14 @@ main PROC
   mov	ecx, 10
 _getNumLoop:
   push  ecx
+  push	offset	wrongNum
+  push	offset	bytesRead
   push	offset	inString
   push	offset	enterNum
   call	ReadVal
-
-; Uses the mGetString to get the user inpus in the form of a string of digits.
-; Converts the the ascii digits to its numeric value representation (SDWORD).
-; Needs to validate that the user's input is a valid number.
-; Store it in a list.
-
-  ;call WriteVal
   pop ecx
   loop _getNumLoop
 
-; Implement two procedures for signed integers which useing string primitive directions.
-
-; Needs a loop counter for 10.
-
-
-
-
-
-
-; Convert the number to a string of ascii digits.
-; Invoke the mDisplayString macro to print the ASCII represntation of the SDWORD value.
 
 	Invoke ExitProcess,0	; exit to operating system
 main ENDP
@@ -119,30 +105,81 @@ Intro	Proc
   PUSH	EBP						; Preserve EBP
   mov	EBP, ESP				; Assign static stack-fram pointer.
 
-  mov	edx, [ebp+8]
-  mDisplayString edx			; Prints intro1.
+  mDisplayString [ebp+8]			; Prints intro1.
 
   pop	EBP						; Restore EBP.
   RET	4
 Intro	ENDP
 
-
-
-; 48 is the magic number for changing ascii to a number.
+;----------------------------------------------------------------------------------------------------
+; Name: intro
+;
+; Displays the introduction 
+;
+; Preconditions: The only preconditions are that the variables need to be pushed onto the stack in
+; the correct order.
+;
+; Postconditions: EDX changed.
+;
+; Receives: 
+;	
+; 
+; Returns: None
+;----------------------------------------------------------------------------------------------------
 ReadVal	Proc
   PUSH	EBP						; Preserve EBP
   mov	EBP, ESP				; Assign static stack-fram pointer.
 
-  mGetString [ebp+8], CHARACTERSIZE, [ebp+12]
+
+  mGetString [ebp+8], CHARACTERSIZE, [ebp+12], [ebp+16]
+  mov	eax, [ebp+16]
+  mov	esi, [ebp+12]
+
+cld
+
+  xor	eax, eax
+  mov	ecx, eax
+  dec	ecx
+
+LODSB
+  cmp	al, 48
+  jl	_invalid
+  cmp	al, 57
+  jg	_invalid
 
 
+  jmp	_end
+
+  
+
+
+
+_invalid:
+  mGetString [ebp+20], CHARACTERSIZE, [ebp+12], [ebp+16]
+
+
+  _end:
   pop	EBP						; Restore EBP.
-  RET	8						; Change this value to however much is pushed onto the stack before the procedure is called.
+  RET	16						; Change this value to however much is pushed onto the stack before the procedure is called.
 
 ReadVal		ENDP
 
 
-
+;----------------------------------------------------------------------------------------------------
+; Name: intro
+;
+; Displays the introduction 
+;
+; Preconditions: The only preconditions are that the variables need to be pushed onto the stack in
+; the correct order.
+;
+; Postconditions: EDX changed.
+;
+; Receives: 
+;	
+; 
+; Returns: None
+;----------------------------------------------------------------------------------------------------
 WriteVal	Proc
   PUSH	EBP						; Preserve EBP
   mov	EBP, ESP				; Assign static stack-fram pointer.

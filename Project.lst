@@ -1,4 +1,4 @@
-Microsoft (R) Macro Assembler Version 14.29.30138.0	    03/08/22 19:30:38
+Microsoft (R) Macro Assembler Version 14.29.30138.0	    03/08/22 22:13:00
 "Project 6     (Proj6_pruittad.asm			     Page 1 - 1
 
 
@@ -32,12 +32,14 @@ Microsoft (R) Macro Assembler Version 14.29.30138.0	    03/08/22 19:30:38
 			      C 
 
 				; Macros
-				  mGetString macro numPrompt, count, numEntered
+				  mGetString macro numPrompt, count, numEntered, byteRead
 					mov		edx, numPrompt
 					call	WriteString
 					mov		edx, numEntered
 					mov		ecx, count
-					call	ReadString	
+					call	ReadString
+					mov		[numEntered], edx
+					mov		[byteRead], EAX
 				  
 				ENDM
 				  ; Needs to display a prompt by reference. 
@@ -164,7 +166,7 @@ Microsoft (R) Macro Assembler Version 14.29.30138.0	    03/08/22 19:30:38
  000001DF  00000015 [		  buffer			byte	21 DUP (0)
 	    00
 	   ]
- 000001F4 00000000		  byteCount			dword	?
+ 000001F4 00000000		  bytesRead			dword	?
  000001F8  00000014 [		  inString			byte	CHARACTERSIZE dup(?)
 	    00
 	   ]
@@ -178,40 +180,24 @@ Microsoft (R) Macro Assembler Version 14.29.30138.0	    03/08/22 19:30:38
  00000000			main PROC
 
  00000000  68 00000014 R	  push	offset intro1
- 00000005  E8 0000001F		  call	Intro
+ 00000005  E8 00000029		  call	Intro
 
  0000000A  B9 0000000A		  mov	ecx, 10
  0000000F			_getNumLoop:
  0000000F  51			  push  ecx
- 00000010  68 000001F8 R	  push	offset	inString
- 00000015  68 00000161 R	  push	offset	enterNum
- 0000001A  E8 0000001D		  call	ReadVal
+ 00000010  68 00000180 R	  push	offset	wrongNum
+ 00000015  68 000001F4 R	  push	offset	bytesRead
+ 0000001A  68 000001F8 R	  push	offset	inString
+ 0000001F  68 00000161 R	  push	offset	enterNum
+ 00000024  E8 0000001B		  call	ReadVal
+ 00000029  59			  pop ecx
+ 0000002A  E2 E3		  loop _getNumLoop
 
-				; Uses the mGetString to get the user inpus in the form of a string of digits.
-				; Converts the the ascii digits to its numeric value representation (SDWORD).
-				; Needs to validate that the user's input is a valid number.
-				; Store it in a list.
-
-				  ;call WriteVal
- 0000001F  59			  pop ecx
- 00000020  E2 ED		  loop _getNumLoop
-
-				; Implement two procedures for signed integers which useing string primitive directions.
-
-				; Needs a loop counter for 10.
-
-
-
-
-
-
-				; Convert the number to a string of ascii digits.
-				; Invoke the mDisplayString macro to print the ASCII represntation of the SDWORD value.
 
 					Invoke ExitProcess,0	; exit to operating system
- 00000022  6A 00	   *	    push   +000000000h
- 00000024  E8 00000000 E   *	    call   ExitProcess
- 00000029			main ENDP
+ 0000002C  6A 00	   *	    push   +000000000h
+ 0000002E  E8 00000000 E   *	    call   ExitProcess
+ 00000033			main ENDP
 
 
 				;----------------------------------------------------------------------------------------------------
@@ -230,57 +216,121 @@ Microsoft (R) Macro Assembler Version 14.29.30138.0	    03/08/22 19:30:38
 				; Returns: None
 				;----------------------------------------------------------------------------------------------------
 
- 00000029			Intro	Proc
- 00000029  55			  PUSH	EBP						; Preserve EBP
- 0000002A  8B EC		  mov	EBP, ESP				; Assign static stack-fram pointer.
+ 00000033			Intro	Proc
+ 00000033  55			  PUSH	EBP						; Preserve EBP
+ 00000034  8B EC		  mov	EBP, ESP				; Assign static stack-fram pointer.
 
- 0000002C  8B 55 08		  mov	edx, [ebp+8]
-				  mDisplayString edx			; Prints intro1.
- 0000002F  52		     1		push	EDX
- 00000030  8B D2	     1		mov		EDX, edx
- 00000032  E8 00000000 E     1		call	WriteString					; Prints whatever string is passed to it.
- 00000037  5A		     1		pop		EDX
+				  mDisplayString [ebp+8]			; Prints intro1.
+ 00000036  52		     1		push	EDX
+ 00000037  8B 55 08	     1		mov		EDX, [ebp+8]
+ 0000003A  E8 00000000 E     1		call	WriteString					; Prints whatever string is passed to it.
+ 0000003F  5A		     1		pop		EDX
 
- 00000038  5D			  pop	EBP						; Restore EBP.
- 00000039  C2 0004		  RET	4
- 0000003C			Intro	ENDP
+ 00000040  5D			  pop	EBP						; Restore EBP.
+ 00000041  C2 0004		  RET	4
+ 00000044			Intro	ENDP
 
-
-
-				; 48 is the magic number for changing ascii to a number.
- 0000003C			ReadVal	Proc
- 0000003C  55			  PUSH	EBP						; Preserve EBP
- 0000003D  8B EC		  mov	EBP, ESP				; Assign static stack-fram pointer.
-
-				  mGetString [ebp+8], CHARACTERSIZE, [ebp+12]
- 0000003F  8B 55 08	     1		mov		edx, [ebp+8]
- 00000042  E8 00000000 E     1		call	WriteString
- 00000047  8B 55 0C	     1		mov		edx, [ebp+12]
- 0000004A  B9 00000014	     1		mov		ecx, CHARACTERSIZE
- 0000004F  E8 00000000 E     1		call	ReadString	
-
-
- 00000054  5D			  pop	EBP						; Restore EBP.
- 00000055  C2 0008		  RET	8						; Change this value to however much is pushed onto the stack before the procedure is called.
-
- 00000058			ReadVal		ENDP
+				;----------------------------------------------------------------------------------------------------
+				; Name: intro
+				;
+				; Displays the introduction 
+				;
+				; Preconditions: The only preconditions are that the variables need to be pushed onto the stack in
+				; the correct order.
+				;
+				; Postconditions: EDX changed.
+				;
+				; Receives: 
+				;	
+				; 
+				; Returns: None
+				;----------------------------------------------------------------------------------------------------
+ 00000044			ReadVal	Proc
+ 00000044  55			  PUSH	EBP						; Preserve EBP
+ 00000045  8B EC		  mov	EBP, ESP				; Assign static stack-fram pointer.
 
 
+				  mGetString [ebp+8], CHARACTERSIZE, [ebp+12], [ebp+16]
+ 00000047  8B 55 08	     1		mov		edx, [ebp+8]
+ 0000004A  E8 00000000 E     1		call	WriteString
+ 0000004F  8B 55 0C	     1		mov		edx, [ebp+12]
+ 00000052  B9 00000014	     1		mov		ecx, CHARACTERSIZE
+ 00000057  E8 00000000 E     1		call	ReadString
+ 0000005C  89 55 0C	     1		mov		[[ebp+12]], edx
+ 0000005F  89 45 10	     1		mov		[[ebp+16]], EAX
+ 00000062  8B 45 10		  mov	eax, [ebp+16]
+ 00000065  8B 75 0C		  mov	esi, [ebp+12]
 
- 00000058			WriteVal	Proc
- 00000058  55			  PUSH	EBP						; Preserve EBP
- 00000059  8B EC		  mov	EBP, ESP				; Assign static stack-fram pointer.
+ 00000068  FC			cld
+				 ; mov	eax, [ebp+16]
+
+
+ 00000069  33 C0		  xor	eax, eax
+				  ;mov	esi, [edx]
+ 0000006B  8B C8		  mov	ecx, eax
+ 0000006D  49			  dec	ecx
+
+ 0000006E  AC			LODSB
+
+ 0000006F  3C 30		  cmp	al, 48
+ 00000071  7C 06		  jl	_invalid
+ 00000073  3C 39		  cmp	al, 57
+ 00000075  7F 02		  jg	_invalid
+
+
+ 00000077  EB 1B		  jmp	_end
+
+				  
 
 
 
- 0000005B  5D			  pop	EBP						; Restore EBP.
- 0000005C  C2 0004		  RET	4						; Change this value to however much is pushed onto the stack before the procedure is called.
+ 00000079			_invalid:
+				  mGetString [ebp+20], CHARACTERSIZE, [ebp+12], [ebp+16]
+ 00000079  8B 55 14	     1		mov		edx, [ebp+20]
+ 0000007C  E8 00000000 E     1		call	WriteString
+ 00000081  8B 55 0C	     1		mov		edx, [ebp+12]
+ 00000084  B9 00000014	     1		mov		ecx, CHARACTERSIZE
+ 00000089  E8 00000000 E     1		call	ReadString
+ 0000008E  89 55 0C	     1		mov		[[ebp+12]], edx
+ 00000091  89 45 10	     1		mov		[[ebp+16]], EAX
 
- 0000005F			WriteVal	ENDP
+
+ 00000094			  _end:
+ 00000094  5D			  pop	EBP						; Restore EBP.
+ 00000095  C2 0010		  RET	16						; Change this value to however much is pushed onto the stack before the procedure is called.
+
+ 00000098			ReadVal		ENDP
+
+
+				;----------------------------------------------------------------------------------------------------
+				; Name: intro
+				;
+				; Displays the introduction 
+				;
+				; Preconditions: The only preconditions are that the variables need to be pushed onto the stack in
+				; the correct order.
+				;
+				; Postconditions: EDX changed.
+				;
+				; Receives: 
+				;	
+				; 
+				; Returns: None
+				;----------------------------------------------------------------------------------------------------
+ 00000098			WriteVal	Proc
+ 00000098  55			  PUSH	EBP						; Preserve EBP
+ 00000099  8B EC		  mov	EBP, ESP				; Assign static stack-fram pointer.
+
+
+
+ 0000009B  5D			  pop	EBP						; Restore EBP.
+ 0000009C  C2 0004		  RET	4						; Change this value to however much is pushed onto the stack before the procedure is called.
+
+ 0000009F			WriteVal	ENDP
 
 				END main
 
-Microsoft (R) Macro Assembler Version 14.29.30138.0	    03/08/22 19:30:38
+Microsoft (R) Macro Assembler Version 14.29.30138.0	    03/08/22 22:13:00
 "Project 6     (Proj6_pruittad.asm			     Symbols 2 - 1
 
 
@@ -383,7 +433,7 @@ Segments and Groups:
 FLAT . . . . . . . . . . . . . .	GROUP
 STACK  . . . . . . . . . . . . .	32 Bit	 00001000 Para	  Stack	  'STACK'	 
 _DATA  . . . . . . . . . . . . .	32 Bit	 0000020C Para	  Public  'DATA'	
-_TEXT  . . . . . . . . . . . . .	32 Bit	 0000005F Para	  Public  'CODE'	
+_TEXT  . . . . . . . . . . . . .	32 Bit	 0000009F Para	  Public  'CODE'	
 
 
 Procedures, parameters, and locals:
@@ -429,7 +479,7 @@ HeapCreate . . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External
 HeapDestroy  . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
 HeapFree . . . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
 HeapSize . . . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
-Intro  . . . . . . . . . . . . .	P Near	 00000029 _TEXT	Length= 00000013 Public STDCALL
+Intro  . . . . . . . . . . . . .	P Near	 00000033 _TEXT	Length= 00000011 Public STDCALL
 IsDigit  . . . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
 LocalFree  . . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
 MessageBoxA  . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
@@ -454,7 +504,9 @@ ReadInt  . . . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External
 ReadKeyFlush . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
 ReadKey  . . . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
 ReadString . . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
-ReadVal  . . . . . . . . . . . .	P Near	 0000003C _TEXT	Length= 0000001C Public STDCALL
+ReadVal  . . . . . . . . . . . .	P Near	 00000044 _TEXT	Length= 00000054 Public STDCALL
+  _invalid . . . . . . . . . . .	L Near	 00000079 _TEXT	
+  _end . . . . . . . . . . . . .	L Near	 00000094 _TEXT	
 SetConsoleCursorInfo . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
 SetConsoleCursorPosition . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
 SetConsoleMode . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
@@ -491,9 +543,9 @@ WriteStackFrameName  . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External
 WriteStackFrame  . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
 WriteString  . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
 WriteToFile  . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
-WriteVal . . . . . . . . . . . .	P Near	 00000058 _TEXT	Length= 00000007 Public STDCALL
+WriteVal . . . . . . . . . . . .	P Near	 00000098 _TEXT	Length= 00000007 Public STDCALL
 WriteWindowsMsg  . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
-main . . . . . . . . . . . . . .	P Near	 00000000 _TEXT	Length= 00000029 Public STDCALL
+main . . . . . . . . . . . . . .	P Near	 00000000 _TEXT	Length= 00000033 Public STDCALL
   _getNumLoop  . . . . . . . . .	L Near	 0000000F _TEXT	
 printf . . . . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External C
 scanf  . . . . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External C
@@ -719,7 +771,7 @@ black  . . . . . . . . . . . . .	Number	 00000000h
 blue . . . . . . . . . . . . . .	Number	 00000001h   
 brown  . . . . . . . . . . . . .	Number	 00000006h   
 buffer . . . . . . . . . . . . .	Byte	 000001DF _DATA	
-byteCount  . . . . . . . . . . .	DWord	 000001F4 _DATA	
+bytesRead  . . . . . . . . . . .	DWord	 000001F4 _DATA	
 cyan . . . . . . . . . . . . . .	Number	 00000003h   
 enterNum . . . . . . . . . . . .	Byte	 00000161 _DATA	
 exit . . . . . . . . . . . . . .	Text   	 INVOKE ExitProcess,0
