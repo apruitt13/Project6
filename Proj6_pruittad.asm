@@ -11,12 +11,13 @@ TITLE Project 6     (Proj6_pruittad.asm)
 INCLUDE Irvine32.inc
 
 ; Macros
-  mGetString macro numPrompt
-
-  PUSH  EAX
-  MOV   EDX, numPrompt
-  CALL  WriteString
-  POP   EAX
+  mGetString macro numPrompt, count, numEntered
+	mov		edx, numPrompt
+	call	WriteString
+	mov		edx, numEntered
+	mov		ecx, count
+	call	ReadString	
+  
 ENDM
   ; Needs to display a prompt by reference. 
 
@@ -26,29 +27,35 @@ ENDM
 
 
   mDisplayString macro string
-	push	EAX
+	push	EDX
+	mov		EDX, string
 	call	WriteString					; Prints whatever string is passed to it.
-	pop		EAX
+	pop		EDX
   ENDM
 
 
 ; (insert constant definitions here)
   ARRAYSIZE = 5
-  STRINGSIZE = 11
+  CHARACTERSIZE	= 20
+  
 
 .data
  
-  randArray			dword	ARRAYSIZE DUP(?)
+  numArray			dword	ARRAYSIZE DUP(?)
 
   intro1			byte	"PROGRAMMING ASSIGNMENT 6: Designing low-level I/O procedures", 13, 10
 					byte	"Written by: Adam Pruitt", 13, 10, 13, 10
 					byte	"Please provide 10 signed decimal integers.", 13, 10
 					byte	"Each number needs to be small enough to fit inside a 32 bit register. After you have finished inputting", 13, 10
 					byte	"the raw numbers I will display a list of the integers, their sum, and their average value.", 13, 10, 13, 10, 0
-  enterNum			byte	"Please enter a signed number: ", 10, 13, 0
+  enterNum			byte	"Please enter a signed number: ", 0
   wrongNum			byte	"ERROR: You did not enter a signed number or your number was too big.", 13, 10
 					byte	"Please try again: ", 13, 10, 0
   stringLen			dword	?	
+  buffer			byte	21 DUP (0)
+  byteCount			dword	?
+  inString			byte	CHARACTERSIZE dup(?)
+
 
   
 
@@ -60,9 +67,10 @@ main PROC
   push	offset intro1
   call	Intro
 
-  mov	ecx, STRINGSIZE
-_getNumLoop:
-
+  ;mov	ecx, STRINGSIZE
+;_getNumLoop:
+  push	offset	inString
+  push	offset	enterNum
   call	ReadVal
 
 ; Uses the mGetString to get the user inpus in the form of a string of digits.
@@ -72,7 +80,7 @@ _getNumLoop:
 
   call WriteVal
 
-  loop _getNumLoop
+  ;loop _getNumLoop
 
 ; Implement two procedures for signed integers which useing string primitive directions.
 
@@ -124,6 +132,10 @@ ReadVal	Proc
   PUSH	EBP						; Preserve EBP
   mov	EBP, ESP				; Assign static stack-fram pointer.
 
+  mov	edx, [ebp+8]
+  mov	eax, [ebp+12]
+  mov	ecx, CHARACTERSIZE
+  mGetString edx, ecx, eax
 
 
   pop	EBP						; Restore EBP.
