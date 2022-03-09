@@ -142,6 +142,7 @@ cld
   dec	ecx
 
 LODSB
+  ; I also need to check if the first number is a negative number or positive. But only the first time. Otherwise it's an invalid number.
   cmp	al, 48
   jl	_invalid
   cmp	al, 57
