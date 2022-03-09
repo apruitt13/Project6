@@ -52,7 +52,7 @@ ENDM
 					byte	"the raw numbers I will display a list of the integers, their sum, and their average value.", 13, 10, 13, 10, 0
   enterNum			byte	"Please enter a signed number: ", 0
   wrongNum			byte	"ERROR: You did not enter a signed number or your number was too big.", 13, 10
-					byte	"Please try again: ", 13, 10, 0
+					byte	"Please try again: ", 0
   stringLen			dword	?	
   buffer			byte	21 DUP (0)
   bytesRead			dword	?
