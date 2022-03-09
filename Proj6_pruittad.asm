@@ -67,8 +67,9 @@ main PROC
   push	offset intro1
   call	Intro
 
-  ;mov	ecx, STRINGSIZE
-;_getNumLoop:
+  mov	ecx, 10
+_getNumLoop:
+  push  ecx
   push	offset	inString
   push	offset	enterNum
   call	ReadVal
@@ -78,9 +79,9 @@ main PROC
 ; Needs to validate that the user's input is a valid number.
 ; Store it in a list.
 
-  call WriteVal
-
-  ;loop _getNumLoop
+  ;call WriteVal
+  pop ecx
+  loop _getNumLoop
 
 ; Implement two procedures for signed integers which useing string primitive directions.
 
@@ -132,14 +133,11 @@ ReadVal	Proc
   PUSH	EBP						; Preserve EBP
   mov	EBP, ESP				; Assign static stack-fram pointer.
 
-  mov	edx, [ebp+8]
-  mov	eax, [ebp+12]
-  mov	ecx, CHARACTERSIZE
-  mGetString edx, ecx, eax
+  mGetString [ebp+8], CHARACTERSIZE, [ebp+12]
 
 
   pop	EBP						; Restore EBP.
-  RET	4						; Change this value to however much is pushed onto the stack before the procedure is called.
+  RET	8						; Change this value to however much is pushed onto the stack before the procedure is called.
 
 ReadVal		ENDP
 
