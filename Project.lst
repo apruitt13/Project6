@@ -1,4 +1,4 @@
-Microsoft (R) Macro Assembler Version 14.29.30138.0	    03/08/22 22:13:00
+Microsoft (R) Macro Assembler Version 14.29.30140.0	    03/09/22 06:29:53
 "Project 6     (Proj6_pruittad.asm			     Page 1 - 1
 
 
@@ -157,17 +157,16 @@ Microsoft (R) Macro Assembler Version 14.29.30138.0	    03/08/22 22:13:00
 	   20 77 61 73 20
 	   74 6F 6F 20 62
 	   69 67 2E 0D 0A
- 000001C6  50 6C 65 61 73						byte	"Please try again: ", 13, 10, 0
+ 000001C6  50 6C 65 61 73						byte	"Please try again: ", 0
 	   65 20 74 72 79
 	   20 61 67 61 69
-	   6E 3A 20 0D 0A
-	   00
- 000001DB 00000000		  stringLen			dword	?	
- 000001DF  00000015 [		  buffer			byte	21 DUP (0)
+	   6E 3A 20 00
+ 000001D9 00000000		  stringLen			dword	?	
+ 000001DD  00000015 [		  buffer			byte	21 DUP (0)
 	    00
 	   ]
- 000001F4 00000000		  bytesRead			dword	?
- 000001F8  00000014 [		  inString			byte	CHARACTERSIZE dup(?)
+ 000001F2 00000000		  bytesRead			dword	?
+ 000001F6  00000014 [		  inString			byte	CHARACTERSIZE dup(?)
 	    00
 	   ]
 
@@ -186,8 +185,8 @@ Microsoft (R) Macro Assembler Version 14.29.30138.0	    03/08/22 22:13:00
  0000000F			_getNumLoop:
  0000000F  51			  push  ecx
  00000010  68 00000180 R	  push	offset	wrongNum
- 00000015  68 000001F4 R	  push	offset	bytesRead
- 0000001A  68 000001F8 R	  push	offset	inString
+ 00000015  68 000001F2 R	  push	offset	bytesRead
+ 0000001A  68 000001F6 R	  push	offset	inString
  0000001F  68 00000161 R	  push	offset	enterNum
  00000024  E8 0000001B		  call	ReadVal
  00000029  59			  pop ecx
@@ -262,16 +261,12 @@ Microsoft (R) Macro Assembler Version 14.29.30138.0	    03/08/22 22:13:00
  00000065  8B 75 0C		  mov	esi, [ebp+12]
 
  00000068  FC			cld
-				 ; mov	eax, [ebp+16]
-
 
  00000069  33 C0		  xor	eax, eax
-				  ;mov	esi, [edx]
  0000006B  8B C8		  mov	ecx, eax
  0000006D  49			  dec	ecx
 
  0000006E  AC			LODSB
-
  0000006F  3C 30		  cmp	al, 48
  00000071  7C 06		  jl	_invalid
  00000073  3C 39		  cmp	al, 57
@@ -330,7 +325,7 @@ Microsoft (R) Macro Assembler Version 14.29.30138.0	    03/08/22 22:13:00
 
 				END main
 
-Microsoft (R) Macro Assembler Version 14.29.30138.0	    03/08/22 22:13:00
+Microsoft (R) Macro Assembler Version 14.29.30140.0	    03/09/22 06:29:53
 "Project 6     (Proj6_pruittad.asm			     Symbols 2 - 1
 
 
@@ -432,7 +427,7 @@ Segments and Groups:
 
 FLAT . . . . . . . . . . . . . .	GROUP
 STACK  . . . . . . . . . . . . .	32 Bit	 00001000 Para	  Stack	  'STACK'	 
-_DATA  . . . . . . . . . . . . .	32 Bit	 0000020C Para	  Public  'DATA'	
+_DATA  . . . . . . . . . . . . .	32 Bit	 0000020A Para	  Public  'DATA'	
 _TEXT  . . . . . . . . . . . . .	32 Bit	 0000009F Para	  Public  'CODE'	
 
 
@@ -770,14 +765,14 @@ WriteConsole . . . . . . . . . .	Text   	 WriteConsoleA
 black  . . . . . . . . . . . . .	Number	 00000000h   
 blue . . . . . . . . . . . . . .	Number	 00000001h   
 brown  . . . . . . . . . . . . .	Number	 00000006h   
-buffer . . . . . . . . . . . . .	Byte	 000001DF _DATA	
-bytesRead  . . . . . . . . . . .	DWord	 000001F4 _DATA	
+buffer . . . . . . . . . . . . .	Byte	 000001DD _DATA	
+bytesRead  . . . . . . . . . . .	DWord	 000001F2 _DATA	
 cyan . . . . . . . . . . . . . .	Number	 00000003h   
 enterNum . . . . . . . . . . . .	Byte	 00000161 _DATA	
 exit . . . . . . . . . . . . . .	Text   	 INVOKE ExitProcess,0
 gray . . . . . . . . . . . . . .	Number	 00000008h   
 green  . . . . . . . . . . . . .	Number	 00000002h   
-inString . . . . . . . . . . . .	Byte	 000001F8 _DATA	
+inString . . . . . . . . . . . .	Byte	 000001F6 _DATA	
 intro1 . . . . . . . . . . . . .	Byte	 00000014 _DATA	
 lightBlue  . . . . . . . . . . .	Number	 00000009h   
 lightCyan  . . . . . . . . . . .	Number	 0000000Bh   
@@ -788,7 +783,7 @@ lightRed . . . . . . . . . . . .	Number	 0000000Ch
 magenta  . . . . . . . . . . . .	Number	 00000005h   
 numArray . . . . . . . . . . . .	DWord	 00000000 _DATA	
 red  . . . . . . . . . . . . . .	Number	 00000004h   
-stringLen  . . . . . . . . . . .	DWord	 000001DB _DATA	
+stringLen  . . . . . . . . . . .	DWord	 000001D9 _DATA	
 white  . . . . . . . . . . . . .	Number	 0000000Fh   
 wrongNum . . . . . . . . . . . .	Byte	 00000180 _DATA	
 wsprintf . . . . . . . . . . . .	Text   	 wsprintfA
