@@ -230,7 +230,7 @@ WriteVal	Proc
   PUSH	EBP						; Preserve EBP
   mov	EBP, ESP				; Assign static stack-fram pointer.
 
-
+  ; need to change an integer to an ascii representation.
 
   pop	EBP						; Restore EBP.
   RET	4						; Change this value to however much is pushed onto the stack before the procedure is called.
