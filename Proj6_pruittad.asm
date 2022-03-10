@@ -130,12 +130,14 @@ Intro	ENDP
 ReadVal	Proc
   PUSH	EBP						; Preserve EBP
   mov	EBP, ESP				; Assign static stack-fram pointer.
+  mov	edi, 0				; This is going to be my integer
 
 _start:
   mGetString [ebp+8], CHARACTERSIZE, [ebp+12], [ebp+16]
 
   mov	eax, [ebp+16]		; The number of bytes read.
   mov	esi, [ebp+12]		; Storing the string that was entered into esi.
+
 
   cld
 
@@ -146,13 +148,13 @@ _getNumber:			; Right now it is looping too many times. It is going past the end
   xor	eax, eax
 LODSB
   ; I also need to check if the first number is a negative number or positive. But only the first time. Otherwise it's an invalid number.
-  cmp	al, 45
+  cmp	eax, 45
   je	_negative			; If it's a negative sign.
-  cmp	al, 43
+  cmp	eax, 43
   je	_positive			; If it's a positive sign.
-  cmp	al, 48
+  cmp	eax, 48
   jl	_invalid			; Jump to _invalid if it's not a number. Numbers are between 48 and 57.
-  cmp	al, 57
+  cmp	eax, 57
   jg	_invalid
   jmp	_convert
 
@@ -164,6 +166,7 @@ _negative:
   pop	eax
   jl	_invalid
   mov	edx, 1				; Adds 1 to edx to indicate it's a negative number for later.
+  push	edx					; Preserve the 1
   loop	_getNumber
   
 ; If there is a positive sign at the beginning it's a valid number. Otherwise it's invalid.
@@ -182,11 +185,26 @@ _invalid:
   mov	ecx, eax
   jmp	_getNumber
 
+; converting the string to a number.
 _convert:
+  push  eax
+  sub	eax, 48
+  mov	ebp, eax
+  mov	eax, 10
+  mul	edi
+  mov	edi, eax
+  add	edi, ebp
 
   
 
+  
+  pop	eax
   loop	_getNumber
+; check if it was zero and multiply by zero if it was
+  pop	edx
+; add the number to the array.
+
+
   pop	EBP						; Restore EBP.
   RET	16						; Change this value to however much is pushed onto the stack before the procedure is called.
 
