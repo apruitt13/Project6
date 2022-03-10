@@ -57,6 +57,7 @@ ENDM
   buffer			byte	21 DUP (0)
   bytesRead			dword	?
   inString			byte	CHARACTERSIZE dup(?)
+  isNegative		dword	?
 
 
   
@@ -130,43 +131,59 @@ ReadVal	Proc
   PUSH	EBP						; Preserve EBP
   mov	EBP, ESP				; Assign static stack-fram pointer.
 
-
+_start:
   mGetString [ebp+8], CHARACTERSIZE, [ebp+12], [ebp+16]
-  mov	eax, [ebp+16]
-  mov	esi, [ebp+12]
+
+  mov	eax, [ebp+16]		; The number of bytes read.
+  mov	esi, [ebp+12]		; Storing the string that was entered into esi.
 
   cld
 
 
-  xor	eax, eax
   mov	ecx, eax
-  dec	ecx
+
 _getNumber:			; Right now it is looping too many times. It is going past the end. I need to check the number in ECX to see what's wrong. It needs to be the string length.
+  xor	eax, eax
 LODSB
   ; I also need to check if the first number is a negative number or positive. But only the first time. Otherwise it's an invalid number.
   cmp	al, 45
-  je	_negative
+  je	_negative			; If it's a negative sign.
   cmp	al, 43
-  je	_positive
+  je	_positive			; If it's a positive sign.
   cmp	al, 48
-  jl	_invalid
+  jl	_invalid			; Jump to _invalid if it's not a number. Numbers are between 48 and 57.
   cmp	al, 57
   jg	_invalid
   jmp	_convert
 
+; If there is a negative sign at the beginning it's a valid number. Otherwise it's invalid.
 _negative:
-  ; I need to store something to show that it's negative then jump back.
-
+  push	eax
+  mov	eax, [ebp+16]		; The number of bytes read.
+  cmp	ecx, eax
+  pop	eax
+  jl	_invalid
+  mov	edx, 1				; Adds 1 to edx to indicate it's a negative number for later.
+  loop	_getNumber
+  
+; If there is a positive sign at the beginning it's a valid number. Otherwise it's invalid.
 _positive:
+  mov	eax, [ebp+16]		; If there is a plus 
+  cmp	ecx, eax
+  jl	_invalid
+  loop	_getNumber
 
-
-
-
+; The number is not valid. A new string is displayed and a new number retrieved.
 _invalid:
-  mGetString [ebp+20], CHARACTERSIZE, [ebp+12], [ebp+16]
+  mGetString [ebp+20], CHARACTERSIZE, [ebp+12], [ebp+16]		; If it's an invalid number it prints a different statement and counts the string again.
+  mov	eax, [ebp+16]
+  mov	esi, [ebp+12]
 
+  mov	ecx, eax
+  jmp	_getNumber
 
 _convert:
+
   
 
   loop	_getNumber
