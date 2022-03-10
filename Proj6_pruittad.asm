@@ -135,23 +135,30 @@ ReadVal	Proc
   mov	eax, [ebp+16]
   mov	esi, [ebp+12]
 
-cld
+  cld
+
 
   xor	eax, eax
   mov	ecx, eax
   dec	ecx
-
+_getNumber:			; Right now it is looping too many times. It is going past the end. I need to check the number in ECX to see what's wrong. It needs to be the string length.
 LODSB
   ; I also need to check if the first number is a negative number or positive. But only the first time. Otherwise it's an invalid number.
+  cmp	al, 45
+  je	_negative
+  cmp	al, 43
+  je	_positive
   cmp	al, 48
   jl	_invalid
   cmp	al, 57
   jg	_invalid
+  jmp	_convert
 
+_negative:
+  ; I need to store something to show that it's negative then jump back.
 
-  jmp	_end
+_positive:
 
-  
 
 
 
@@ -159,7 +166,10 @@ _invalid:
   mGetString [ebp+20], CHARACTERSIZE, [ebp+12], [ebp+16]
 
 
-  _end:
+_convert:
+  
+
+  loop	_getNumber
   pop	EBP						; Restore EBP.
   RET	16						; Change this value to however much is pushed onto the stack before the procedure is called.
 
