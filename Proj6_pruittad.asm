@@ -12,6 +12,7 @@ INCLUDE Irvine32.inc
 
 ; Macros
   mGetString macro numPrompt, count, numEntered, byteRead
+	push	edx
 	mov		edx, numPrompt
 	call	WriteString
 	mov		edx, numEntered
@@ -19,6 +20,7 @@ INCLUDE Irvine32.inc
 	call	ReadString
 	mov		[numEntered], edx
 	mov		[byteRead], EAX
+	pop		edx
   
 ENDM
   ; Needs to display a prompt by reference. 
@@ -53,9 +55,9 @@ ENDM
   enterNum			byte	"Please enter a signed number: ", 0
   wrongNum			byte	"ERROR: You did not enter a signed number or your number was too big.", 13, 10
 					byte	"Please try again: ", 0
-  stringLen			dword	?	
+  stringLen			sdword	?	
   buffer			byte	21 DUP (0)
-  bytesRead			dword	?
+  bytesRead			sdword	?
   inString			byte	CHARACTERSIZE dup(?)
 
   enteredNum		sdword	?
@@ -75,14 +77,14 @@ main PROC
 _getNumLoop:
   push  ecx
 
-  push	offset	enteredNum
+
   push	offset	numArray
   push	offset	wrongNum
   push	offset	bytesRead
   push	offset	inString
   push	offset	enterNum
   call	ReadVal
-  pop ecx
+  ;pop ecx
   loop _getNumLoop
 
 
@@ -134,6 +136,8 @@ Intro	ENDP
 ReadVal	Proc
   PUSH	EBP						; Preserve EBP
   mov	EBP, ESP				; Assign static stack-fram pointer.
+
+
   mov	edi, 0				; This is going to be my integer
 
 
@@ -193,45 +197,56 @@ _invalid:
 ; converting the string to a number.
 _convert:
   push  eax						; Saving the value in eax. This is the ascii value
-  push	ebp
+
   sub	eax, 48					; Subtracting 48 from it.
-  mov	ebp, eax				; Moving it to ebp.
+  mov	ebx, eax				; Moving it to ebp.
   mov	eax, 10					; Moving 10 to eax to multiply.
   mul	edi						; edi is where the number is stored. Starts at 0. Multiply that by 10.
   mov	edi, eax				; Updating edi.
-  add	edi, ebp				; Add edi to the amount when 48 subtracted from it.
+  add	edi, ebx				; Add edi to the amount when 48 subtracted from it.
+ 
 
-  pop	ebp
   pop	eax
   loop	_getNumber
 ; check if it was zero and multiply by zero if it was
   pop	edx
   cmp	edx, 1
+
   je	_isNegative
+ 
   jmp	_addToArray
 
 _isNegative:
 
   neg	edi
+
   jmp	_addToArray
 
 
 _addToArray:
-  mov	eax, [ebp + 28]
-  mov	[eax], edi
-  mov	edi, [eax]
-  
-
-  mov	[ebp + 24], edi
-  mov	eax, [ebp + 24] ; checking the number by writing it. Can be deleted.
-  call	writeint
+  ;mov	eax, [ebp + 28]
   ;mov	[eax], edi
   ;mov	edi, [eax]
+   
+ ; push eax
+
+  mov	eax, [ebp + 24]
+  mov	[eax], edi
+  ;mov	edi, [eax]
+  ;mov	eax, edi
+  ;call	writeint
+
+  add	eax, 4
+
+
 ; add the number to the array.
 
 
+
+
   pop	EBP						; Restore EBP.
-  RET	20						; Change this value to however much is pushed onto the stack before the procedure is called.
+
+  RET	24						; Change this value to however much is pushed onto the stack before the procedure is called.
 
 ReadVal		ENDP
 
