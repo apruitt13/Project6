@@ -287,6 +287,8 @@ _letsChangeThis:
   mov	eax, [edi]
   mov	ecx, 0
 	_next:
+	  cmp	eax, 0
+	  jl	_negative
 	  mov	ebx, 10
 	  cdq
 	  idiv	ebx
@@ -299,6 +301,8 @@ _letsChangeThis:
 
   pop	ecx
   add	edi, 4
+  cmp	ecx, 1
+  je	_end
   mov	al, ','
   call	WriteChar
   mov	al, ' '
@@ -309,6 +313,14 @@ _letsChangeThis:
 _addFour:
   add	esi, 4
   add	ecx, 4
+  jmp	_next
+
+_negative:
+  neg	eax
+  push	eax
+  mov	al, '-'
+  call	writeChar
+  pop	eax
   jmp	_next
 
 _print:

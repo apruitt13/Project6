@@ -1,4 +1,4 @@
-Microsoft (R) Macro Assembler Version 14.29.30138.0	    03/11/22 13:51:24
+Microsoft (R) Macro Assembler Version 14.29.30138.0	    03/11/22 14:23:51
 "Project 6     (Proj6_pruittad.asm			     Page 1 - 1
 
 
@@ -437,55 +437,67 @@ Microsoft (R) Macro Assembler Version 14.29.30138.0	    03/11/22 13:51:24
  0000015F  8B 07		  mov	eax, [edi]
  00000161  B9 00000000		  mov	ecx, 0
  00000166				_next:
- 00000166  BB 0000000A			  mov	ebx, 10
- 0000016B  99				  cdq
- 0000016C  F7 FB			  idiv	ebx
- 0000016E  83 C2 30			  add	edx, 48
- 00000171  89 16			  mov	[esi], edx
- 00000173  83 F8 00			  cmp	eax, 0
- 00000176  7F 18			  jg	_addFour
- 00000178  EB 1E		  jmp	_print
- 0000017A  _back:
+ 00000166  83 F8 00			  cmp	eax, 0
+ 00000169  7C 37			  jl	_negative
+ 0000016B  BB 0000000A			  mov	ebx, 10
+ 00000170  99				  cdq
+ 00000171  F7 FB			  idiv	ebx
+ 00000173  83 C2 30			  add	edx, 48
+ 00000176  89 16			  mov	[esi], edx
+ 00000178  83 F8 00			  cmp	eax, 0
+ 0000017B  7F 1D			  jg	_addFour
+ 0000017D  EB 30		  jmp	_print
+ 0000017F			  _back:
 
- 0000017A  59			  pop	ecx
- 0000017B  83 C7 04		  add	edi, 4
- 0000017E  B0 2C		  mov	al, ','
- 00000180  E8 00000000 E	  call	WriteChar
- 00000185  B0 20		  mov	al, ' '
- 00000187  E8 00000000 E	  call	WriteChar
- 0000018C  E2 D0		  loop	_letsChangeThis
- 0000018E  EB 20		  jmp	_end
+ 0000017F  59			  pop	ecx
+ 00000180  83 C7 04		  add	edi, 4
+ 00000183  83 F9 01		  cmp	ecx, 1
+ 00000186  74 3F		  je	_end
+ 00000188  B0 2C		  mov	al, ','
+ 0000018A  E8 00000000 E	  call	WriteChar
+ 0000018F  B0 20		  mov	al, ' '
+ 00000191  E8 00000000 E	  call	WriteChar
+ 00000196  E2 C6		  loop	_letsChangeThis
+ 00000198  EB 2D		  jmp	_end
 
- 00000190			_addFour:
- 00000190  83 C6 04		  add	esi, 4
- 00000193  83 C1 04		  add	ecx, 4
- 00000196  EB CE		  jmp	_next
+ 0000019A			_addFour:
+ 0000019A  83 C6 04		  add	esi, 4
+ 0000019D  83 C1 04		  add	ecx, 4
+ 000001A0  EB C4		  jmp	_next
 
- 00000198			_print:
- 00000198  8B 75 14		  mov	esi, [ebp + 20]
- 0000019B  03 F1		  add	esi, ecx
+ 000001A2			_negative:
+ 000001A2  F7 D8		  neg	eax
+ 000001A4  50			  push	eax
+ 000001A5  B0 2D		  mov	al, '-'
+ 000001A7  E8 00000000 E	  call	writeChar
+ 000001AC  58			  pop	eax
+ 000001AD  EB B7		  jmp	_next
+
+ 000001AF			_print:
+ 000001AF  8B 75 14		  mov	esi, [ebp + 20]
+ 000001B2  03 F1		  add	esi, ecx
 				  mDisplayString esi
- 0000019D  52		     1		push	EDX
- 0000019E  8B D6	     1		mov		EDX, esi
- 000001A0  E8 00000000 E     1		call	WriteString					; Prints whatever string is passed to it.
- 000001A5  5A		     1		pop		EDX
+ 000001B4  52		     1		push	EDX
+ 000001B5  8B D6	     1		mov		EDX, esi
+ 000001B7  E8 00000000 E     1		call	WriteString					; Prints whatever string is passed to it.
+ 000001BC  5A		     1		pop		EDX
 
- 000001A6  83 E9 04		  sub	ecx, 4
- 000001A9  83 F9 00		  cmp	ecx, 0
- 000001AC  7D EA		  jge	_print
- 000001AE  EB CA		  jmp	_back
+ 000001BD  83 E9 04		  sub	ecx, 4
+ 000001C0  83 F9 00		  cmp	ecx, 0
+ 000001C3  7D EA		  jge	_print
+ 000001C5  EB B8		  jmp	_back
 
 
 				  ; need to change an integer to an ascii representation.
- 000001B0			  _end:
- 000001B0  5D			  pop	EBP						; Restore EBP.
- 000001B1  C2 0010		  RET	16						; Change this value to however much is pushed onto the stack before the procedure is called.
+ 000001C7			  _end:
+ 000001C7  5D			  pop	EBP						; Restore EBP.
+ 000001C8  C2 0010		  RET	16						; Change this value to however much is pushed onto the stack before the procedure is called.
 
- 000001B4			WriteVal	ENDP
+ 000001CB			WriteVal	ENDP
 
 				END main
 
-Microsoft (R) Macro Assembler Version 14.29.30138.0	    03/11/22 13:51:24
+Microsoft (R) Macro Assembler Version 14.29.30138.0	    03/11/22 14:23:51
 "Project 6     (Proj6_pruittad.asm			     Symbols 2 - 1
 
 
@@ -588,7 +600,7 @@ Segments and Groups:
 FLAT . . . . . . . . . . . . . .	GROUP
 STACK  . . . . . . . . . . . . .	32 Bit	 00001000 Para	  Stack	  'STACK'	 
 _DATA  . . . . . . . . . . . . .	32 Bit	 000002A0 Para	  Public  'DATA'	
-_TEXT  . . . . . . . . . . . . .	32 Bit	 000001B4 Para	  Public  'CODE'	
+_TEXT  . . . . . . . . . . . . .	32 Bit	 000001CB Para	  Public  'CODE'	
 
 
 Procedures, parameters, and locals:
@@ -704,14 +716,15 @@ WriteStackFrameName  . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External
 WriteStackFrame  . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
 WriteString  . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
 WriteToFile  . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
-WriteVal . . . . . . . . . . . .	P Near	 00000135 _TEXT	Length= 0000007F Public STDCALL
+WriteVal . . . . . . . . . . . .	P Near	 00000135 _TEXT	Length= 00000096 Public STDCALL
   _itsAnArray  . . . . . . . . .	L Near	 00000154 _TEXT	
   _letsChangeThis  . . . . . . .	L Near	 0000015E _TEXT	
   _next  . . . . . . . . . . . .	L Near	 00000166 _TEXT	
-  _back  . . . . . . . . . . . .	L Near	 0000017A _TEXT	
-  _addFour . . . . . . . . . . .	L Near	 00000190 _TEXT	
-  _print . . . . . . . . . . . .	L Near	 00000198 _TEXT	
-  _end . . . . . . . . . . . . .	L Near	 000001B0 _TEXT	
+  _back  . . . . . . . . . . . .	L Near	 0000017F _TEXT	
+  _addFour . . . . . . . . . . .	L Near	 0000019A _TEXT	
+  _negative  . . . . . . . . . .	L Near	 000001A2 _TEXT	
+  _print . . . . . . . . . . . .	L Near	 000001AF _TEXT	
+  _end . . . . . . . . . . . . .	L Near	 000001C7 _TEXT	
 WriteWindowsMsg  . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
 main . . . . . . . . . . . . . .	P Near	 00000000 _TEXT	Length= 00000062 Public STDCALL
   _getNumLoop  . . . . . . . . .	L Near	 0000000F _TEXT	
