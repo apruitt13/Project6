@@ -1,4 +1,4 @@
-Microsoft (R) Macro Assembler Version 14.29.30138.0	    03/10/22 21:59:25
+Microsoft (R) Macro Assembler Version 14.29.30138.0	    03/10/22 22:10:57
 "Project 6     (Proj6_pruittad.asm			     Page 1 - 1
 
 
@@ -33,7 +33,6 @@ Microsoft (R) Macro Assembler Version 14.29.30138.0	    03/10/22 21:59:25
 
 				; Macros
 				  mGetString macro numPrompt, count, numEntered, byteRead
-					push	edx
 					mov		edx, numPrompt
 					call	WriteString
 					mov		edx, numEntered
@@ -41,7 +40,6 @@ Microsoft (R) Macro Assembler Version 14.29.30138.0	    03/10/22 21:59:25
 					call	ReadString
 					mov		[numEntered], edx
 					mov		[byteRead], EAX
-					pop		edx
 				  
 				ENDM
 				  ; Needs to display a prompt by reference. 
@@ -183,7 +181,7 @@ Microsoft (R) Macro Assembler Version 14.29.30138.0	    03/10/22 21:59:25
  00000000			main PROC
 
  00000000  68 00000028 R	  push	offset intro1
- 00000005  E8 0000002D		  call	Intro
+ 00000005  E8 0000002E		  call	Intro
 
  0000000A  B9 0000000A		  mov	ecx, 10
  0000000F			_getNumLoop:
@@ -195,15 +193,15 @@ Microsoft (R) Macro Assembler Version 14.29.30138.0	    03/10/22 21:59:25
  0000001A  68 00000206 R	  push	offset	bytesRead
  0000001F  68 0000020A R	  push	offset	inString
  00000024  68 00000175 R	  push	offset	enterNum
- 00000029  E8 0000001A		  call	ReadVal
-				  ;pop ecx
- 0000002E  E2 DF		  loop _getNumLoop
+ 00000029  E8 0000001B		  call	ReadVal
+ 0000002E  59			  pop ecx
+ 0000002F  E2 DE		  loop _getNumLoop
 
 
 					Invoke ExitProcess,0	; exit to operating system
- 00000030  6A 00	   *	    push   +000000000h
- 00000032  E8 00000000 E   *	    call   ExitProcess
- 00000037			main ENDP
+ 00000031  6A 00	   *	    push   +000000000h
+ 00000033  E8 00000000 E   *	    call   ExitProcess
+ 00000038			main ENDP
 
 
 				;----------------------------------------------------------------------------------------------------
@@ -222,19 +220,19 @@ Microsoft (R) Macro Assembler Version 14.29.30138.0	    03/10/22 21:59:25
 				; Returns: None
 				;----------------------------------------------------------------------------------------------------
 
- 00000037			Intro	Proc
- 00000037  55			  PUSH	EBP						; Preserve EBP
- 00000038  8B EC		  mov	EBP, ESP				; Assign static stack-fram pointer.
+ 00000038			Intro	Proc
+ 00000038  55			  PUSH	EBP						; Preserve EBP
+ 00000039  8B EC		  mov	EBP, ESP				; Assign static stack-fram pointer.
 
 				  mDisplayString [ebp+8]			; Prints intro1.
- 0000003A  52		     1		push	EDX
- 0000003B  8B 55 08	     1		mov		EDX, [ebp+8]
- 0000003E  E8 00000000 E     1		call	WriteString					; Prints whatever string is passed to it.
- 00000043  5A		     1		pop		EDX
+ 0000003B  52		     1		push	EDX
+ 0000003C  8B 55 08	     1		mov		EDX, [ebp+8]
+ 0000003F  E8 00000000 E     1		call	WriteString					; Prints whatever string is passed to it.
+ 00000044  5A		     1		pop		EDX
 
- 00000044  5D			  pop	EBP						; Restore EBP.
- 00000045  C2 0004		  RET	4
- 00000048			Intro	ENDP
+ 00000045  5D			  pop	EBP						; Restore EBP.
+ 00000046  C2 0004		  RET	4
+ 00000049			Intro	ENDP
 
 				;----------------------------------------------------------------------------------------------------
 				; Name: intro
@@ -251,25 +249,22 @@ Microsoft (R) Macro Assembler Version 14.29.30138.0	    03/10/22 21:59:25
 				; 
 				; Returns: None
 				;----------------------------------------------------------------------------------------------------
- 00000048			ReadVal	Proc
- 00000048  55			  PUSH	EBP						; Preserve EBP
- 00000049  8B EC		  mov	EBP, ESP				; Assign static stack-fram pointer.
+ 00000049			ReadVal	Proc
+ 00000049  55			  PUSH	EBP						; Preserve EBP
+ 0000004A  8B EC		  mov	EBP, ESP				; Assign static stack-fram pointer.
+ 0000004C  57			  push	edi
+ 0000004D  BF 00000000		  mov	edi, 0				; This is going to be my integer
 
 
- 0000004B  BF 00000000		  mov	edi, 0				; This is going to be my integer
-
-
- 00000050			_start:
+ 00000052			_start:
 				  mGetString [ebp+8], CHARACTERSIZE, [ebp+12], [ebp+16]
- 00000050  52		     1		push	edx
- 00000051  8B 55 08	     1		mov		edx, [ebp+8]
- 00000054  E8 00000000 E     1		call	WriteString
- 00000059  8B 55 0C	     1		mov		edx, [ebp+12]
- 0000005C  B9 00000014	     1		mov		ecx, CHARACTERSIZE
- 00000061  E8 00000000 E     1		call	ReadString
- 00000066  89 55 0C	     1		mov		[[ebp+12]], edx
- 00000069  89 45 10	     1		mov		[[ebp+16]], EAX
- 0000006C  5A		     1		pop		edx
+ 00000052  8B 55 08	     1		mov		edx, [ebp+8]
+ 00000055  E8 00000000 E     1		call	WriteString
+ 0000005A  8B 55 0C	     1		mov		edx, [ebp+12]
+ 0000005D  B9 00000014	     1		mov		ecx, CHARACTERSIZE
+ 00000062  E8 00000000 E     1		call	ReadString
+ 00000067  89 55 0C	     1		mov		[[ebp+12]], edx
+ 0000006A  89 45 10	     1		mov		[[ebp+16]], EAX
 
  0000006D  8B 45 10		  mov	eax, [ebp+16]		; The number of bytes read.
  00000070  8B 75 0C		  mov	esi, [ebp+12]		; Storing the string that was entered into esi.
@@ -292,7 +287,7 @@ Microsoft (R) Macro Assembler Version 14.29.30138.0	    03/10/22 21:59:25
  00000086  7C 21		  jl	_invalid			; Jump to _invalid if it's not a number. Numbers are between 48 and 57.
  00000088  83 F8 39		  cmp	eax, 57
  0000008B  7F 1C		  jg	_invalid
- 0000008D  EB 41		  jmp	_convert
+ 0000008D  EB 3F		  jmp	_convert
 
 				; If there is a negative sign at the beginning it's a valid number. Otherwise it's invalid.
  0000008F			_negative:
@@ -315,64 +310,62 @@ Microsoft (R) Macro Assembler Version 14.29.30138.0	    03/10/22 21:59:25
 				; The number is not valid. A new string is displayed and a new number retrieved.
  000000A9			_invalid:
 				  mGetString [ebp+20], CHARACTERSIZE, [ebp+12], [ebp+16]		; If it's an invalid number it prints a different statement and counts the string again.
- 000000A9  52		     1		push	edx
- 000000AA  8B 55 14	     1		mov		edx, [ebp+20]
- 000000AD  E8 00000000 E     1		call	WriteString
- 000000B2  8B 55 0C	     1		mov		edx, [ebp+12]
- 000000B5  B9 00000014	     1		mov		ecx, CHARACTERSIZE
- 000000BA  E8 00000000 E     1		call	ReadString
- 000000BF  89 55 0C	     1		mov		[[ebp+12]], edx
- 000000C2  89 45 10	     1		mov		[[ebp+16]], EAX
- 000000C5  5A		     1		pop		edx
- 000000C6  8B 45 10		  mov	eax, [ebp+16]
- 000000C9  8B 75 0C		  mov	esi, [ebp+12]
+ 000000A9  8B 55 14	     1		mov		edx, [ebp+20]
+ 000000AC  E8 00000000 E     1		call	WriteString
+ 000000B1  8B 55 0C	     1		mov		edx, [ebp+12]
+ 000000B4  B9 00000014	     1		mov		ecx, CHARACTERSIZE
+ 000000B9  E8 00000000 E     1		call	ReadString
+ 000000BE  89 55 0C	     1		mov		[[ebp+12]], edx
+ 000000C1  89 45 10	     1		mov		[[ebp+16]], EAX
+ 000000C4  8B 45 10		  mov	eax, [ebp+16]
+ 000000C7  8B 75 0C		  mov	esi, [ebp+12]
 
- 000000CC  8B C8		  mov	ecx, eax
- 000000CE  EB A6		  jmp	_getNumber
+ 000000CA  8B C8		  mov	ecx, eax
+ 000000CC  EB A8		  jmp	_getNumber
 
 				; converting the string to a number.
- 000000D0			_convert:
- 000000D0  50			  push  eax						; Saving the value in eax. This is the ascii value
+ 000000CE			_convert:
+ 000000CE  50			  push  eax						; Saving the value in eax. This is the ascii value
 
- 000000D1  83 E8 30		  sub	eax, 48					; Subtracting 48 from it.
- 000000D4  8B D8		  mov	ebx, eax				; Moving it to ebp.
- 000000D6  B8 0000000A		  mov	eax, 10					; Moving 10 to eax to multiply.
- 000000DB  F7 E7		  mul	edi						; edi is where the number is stored. Starts at 0. Multiply that by 10.
- 000000DD  8B F8		  mov	edi, eax				; Updating edi.
- 000000DF  03 FB		  add	edi, ebx				; Add edi to the amount when 48 subtracted from it.
+ 000000CF  83 E8 30		  sub	eax, 48					; Subtracting 48 from it.
+ 000000D2  8B D8		  mov	ebx, eax				; Moving it to ebp.
+ 000000D4  B8 0000000A		  mov	eax, 10					; Moving 10 to eax to multiply.
+ 000000D9  F7 E7		  mul	edi						; edi is where the number is stored. Starts at 0. Multiply that by 10.
+ 000000DB  8B F8		  mov	edi, eax				; Updating edi.
+ 000000DD  03 FB		  add	edi, ebx				; Add edi to the amount when 48 subtracted from it.
 				 
 
- 000000E1  58			  pop	eax
- 000000E2  E2 92		  loop	_getNumber
+ 000000DF  58			  pop	eax
+ 000000E0  E2 94		  loop	_getNumber
 				; check if it was zero and multiply by zero if it was
- 000000E4  5A			  pop	edx
- 000000E5  83 FA 01		  cmp	edx, 1
+ 000000E2  5A			  pop	edx
+ 000000E3  83 FA 01		  cmp	edx, 1
 
- 000000E8  74 02		  je	_isNegative
+ 000000E6  74 02		  je	_isNegative
 				 
- 000000EA  EB 04		  jmp	_addToArray
+ 000000E8  EB 05		  jmp	_addToArray
 
- 000000EC			_isNegative:
+ 000000EA			_isNegative:
+ 000000EA  5F			pop	edi 
+ 000000EB  F7 DF		  neg	edi
 
- 000000EC  F7 DF		  neg	edi
-
- 000000EE  EB 00		  jmp	_addToArray
+ 000000ED  EB 00		  jmp	_addToArray
 
 
- 000000F0			_addToArray:
+ 000000EF			_addToArray:
 				  ;mov	eax, [ebp + 28]
 				  ;mov	[eax], edi
 				  ;mov	edi, [eax]
 				   
 				 ; push eax
 
- 000000F0  8B 45 18		  mov	eax, [ebp + 24]
- 000000F3  89 38		  mov	[eax], edi
-				  ;mov	edi, [eax]
-				  ;mov	eax, edi
-				  ;call	writeint
+ 000000EF  8B 45 18		  mov	eax, [ebp + 24]
+ 000000F2  89 38		  mov	[eax], edi
+ 000000F4  8B 38		  mov	edi, [eax]
+ 000000F6  8B C7		  mov	eax, edi
+ 000000F8  E8 00000000 E	  call	writeint
 
- 000000F5  83 C0 04		  add	eax, 4
+ 000000FD  83 C0 04		  add	eax, 4
 
 
 				; add the number to the array.
@@ -380,11 +373,10 @@ Microsoft (R) Macro Assembler Version 14.29.30138.0	    03/10/22 21:59:25
 
 
 
- 000000F8  5D			  pop	EBP						; Restore EBP.
- 000000F9  59			  pop ecx
- 000000FA  C2 0018		  RET	24						; Change this value to however much is pushed onto the stack before the procedure is called.
+ 00000100  5D			  pop	EBP						; Restore EBP.
+ 00000101  C2 0018		  RET	24						; Change this value to however much is pushed onto the stack before the procedure is called.
 
- 000000FD			ReadVal		ENDP
+ 00000104			ReadVal		ENDP
 
 
 				;----------------------------------------------------------------------------------------------------
@@ -402,20 +394,20 @@ Microsoft (R) Macro Assembler Version 14.29.30138.0	    03/10/22 21:59:25
 				; 
 				; Returns: None
 				;----------------------------------------------------------------------------------------------------
- 000000FD			WriteVal	Proc
- 000000FD  55			  PUSH	EBP						; Preserve EBP
- 000000FE  8B EC		  mov	EBP, ESP				; Assign static stack-fram pointer.
+ 00000104			WriteVal	Proc
+ 00000104  55			  PUSH	EBP						; Preserve EBP
+ 00000105  8B EC		  mov	EBP, ESP				; Assign static stack-fram pointer.
 
 				  ; need to change an integer to an ascii representation.
 
- 00000100  5D			  pop	EBP						; Restore EBP.
- 00000101  C2 0004		  RET	4						; Change this value to however much is pushed onto the stack before the procedure is called.
+ 00000107  5D			  pop	EBP						; Restore EBP.
+ 00000108  C2 0004		  RET	4						; Change this value to however much is pushed onto the stack before the procedure is called.
 
- 00000104			WriteVal	ENDP
+ 0000010B			WriteVal	ENDP
 
 				END main
 
-Microsoft (R) Macro Assembler Version 14.29.30138.0	    03/10/22 21:59:25
+Microsoft (R) Macro Assembler Version 14.29.30138.0	    03/10/22 22:10:57
 "Project 6     (Proj6_pruittad.asm			     Symbols 2 - 1
 
 
@@ -518,7 +510,7 @@ Segments and Groups:
 FLAT . . . . . . . . . . . . . .	GROUP
 STACK  . . . . . . . . . . . . .	32 Bit	 00001000 Para	  Stack	  'STACK'	 
 _DATA  . . . . . . . . . . . . .	32 Bit	 00000222 Para	  Public  'DATA'	
-_TEXT  . . . . . . . . . . . . .	32 Bit	 00000104 Para	  Public  'CODE'	
+_TEXT  . . . . . . . . . . . . .	32 Bit	 0000010B Para	  Public  'CODE'	
 
 
 Procedures, parameters, and locals:
@@ -564,7 +556,7 @@ HeapCreate . . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External
 HeapDestroy  . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
 HeapFree . . . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
 HeapSize . . . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
-Intro  . . . . . . . . . . . . .	P Near	 00000037 _TEXT	Length= 00000011 Public STDCALL
+Intro  . . . . . . . . . . . . .	P Near	 00000038 _TEXT	Length= 00000011 Public STDCALL
 IsDigit  . . . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
 LocalFree  . . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
 MessageBoxA  . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
@@ -589,15 +581,15 @@ ReadInt  . . . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External
 ReadKeyFlush . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
 ReadKey  . . . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
 ReadString . . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
-ReadVal  . . . . . . . . . . . .	P Near	 00000048 _TEXT	Length= 000000B5 Public STDCALL
-  _start . . . . . . . . . . . .	L Near	 00000050 _TEXT	
+ReadVal  . . . . . . . . . . . .	P Near	 00000049 _TEXT	Length= 000000BB Public STDCALL
+  _start . . . . . . . . . . . .	L Near	 00000052 _TEXT	
   _getNumber . . . . . . . . . .	L Near	 00000076 _TEXT	
   _negative  . . . . . . . . . .	L Near	 0000008F _TEXT	
   _positive  . . . . . . . . . .	L Near	 000000A0 _TEXT	
   _invalid . . . . . . . . . . .	L Near	 000000A9 _TEXT	
-  _convert . . . . . . . . . . .	L Near	 000000D0 _TEXT	
-  _isNegative  . . . . . . . . .	L Near	 000000EC _TEXT	
-  _addToArray  . . . . . . . . .	L Near	 000000F0 _TEXT	
+  _convert . . . . . . . . . . .	L Near	 000000CE _TEXT	
+  _isNegative  . . . . . . . . .	L Near	 000000EA _TEXT	
+  _addToArray  . . . . . . . . .	L Near	 000000EF _TEXT	
 SetConsoleCursorInfo . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
 SetConsoleCursorPosition . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
 SetConsoleMode . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
@@ -634,9 +626,9 @@ WriteStackFrameName  . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External
 WriteStackFrame  . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
 WriteString  . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
 WriteToFile  . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
-WriteVal . . . . . . . . . . . .	P Near	 000000FD _TEXT	Length= 00000007 Public STDCALL
+WriteVal . . . . . . . . . . . .	P Near	 00000104 _TEXT	Length= 00000007 Public STDCALL
 WriteWindowsMsg  . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
-main . . . . . . . . . . . . . .	P Near	 00000000 _TEXT	Length= 00000037 Public STDCALL
+main . . . . . . . . . . . . . .	P Near	 00000000 _TEXT	Length= 00000038 Public STDCALL
   _getNumLoop  . . . . . . . . .	L Near	 0000000F _TEXT	
 printf . . . . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External C
 scanf  . . . . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External C

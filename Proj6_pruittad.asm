@@ -12,7 +12,6 @@ INCLUDE Irvine32.inc
 
 ; Macros
   mGetString macro numPrompt, count, numEntered, byteRead
-	push	edx
 	mov		edx, numPrompt
 	call	WriteString
 	mov		edx, numEntered
@@ -20,7 +19,6 @@ INCLUDE Irvine32.inc
 	call	ReadString
 	mov		[numEntered], edx
 	mov		[byteRead], EAX
-	pop		edx
   
 ENDM
   ; Needs to display a prompt by reference. 
@@ -84,7 +82,7 @@ _getNumLoop:
   push	offset	inString
   push	offset	enterNum
   call	ReadVal
-  ;pop ecx
+  pop ecx
   loop _getNumLoop
 
 
@@ -136,8 +134,7 @@ Intro	ENDP
 ReadVal	Proc
   PUSH	EBP						; Preserve EBP
   mov	EBP, ESP				; Assign static stack-fram pointer.
-
-
+  push	edi
   mov	edi, 0				; This is going to be my integer
 
 
@@ -217,7 +214,7 @@ _convert:
   jmp	_addToArray
 
 _isNegative:
-
+pop	edi 
   neg	edi
 
   jmp	_addToArray
@@ -232,9 +229,9 @@ _addToArray:
 
   mov	eax, [ebp + 24]
   mov	[eax], edi
-  ;mov	edi, [eax]
-  ;mov	eax, edi
-  ;call	writeint
+  mov	edi, [eax]
+  mov	eax, edi
+  call	writeint
 
   add	eax, 4
 
@@ -245,7 +242,6 @@ _addToArray:
 
 
   pop	EBP						; Restore EBP.
-
   RET	24						; Change this value to however much is pushed onto the stack before the procedure is called.
 
 ReadVal		ENDP
