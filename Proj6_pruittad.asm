@@ -41,11 +41,13 @@ ENDM
 ; (insert constant definitions here)
   ARRAYSIZE = 10
   CHARACTERSIZE	= 20
+  ASCIIARRAYSIZE = 20
   
 
 .data
  
   numArray			sdword	ARRAYSIZE DUP(?)
+  asciiArray		sdword	ASCIIARRAYSIZE DUP(?)
 
   intro1			byte	"PROGRAMMING ASSIGNMENT 6: Designing low-level I/O procedures", 13, 10
 					byte	"Written by: Adam Pruitt", 13, 10, 13, 10
@@ -92,6 +94,7 @@ _getNumLoop:
   ;call	writeint
 
   call	crlf
+  push	offset	asciiArray
   push	count
   push	offset	numArray
   push	offset	enteredNums
@@ -263,43 +266,66 @@ ReadVal		ENDP
 WriteVal	Proc
   PUSH	EBP						; Preserve EBP
   mov	EBP, ESP				; Assign static stack-fram pointer.
+  mov	esi, [ebp + 20]			; Array to store values
 
   mDisplayString [ebp + 8]
 
   mov	ecx, [ebp +16]			; Length of the array.
   cmp	ecx, 10
   je	_itsAnArray
-  mov	ecx, 0
-  jmp	_letsPrintThis
+  mov	ecx, 1
+  jmp	_letsChangeThis
 
 
 _itsAnArray:
   mov	ecx, 10
   mov	edi, [ebp + 12]			; Move the first element of the array.
-  jmp	_letsPrintThis
+  jmp	_letsChangeThis
 
-_letsPrintThis:
-  
+_letsChangeThis:
+  push	ecx
   mov	eax, [edi]
-  idiv	10
-  add	edx, 48
-  mov	esi, edx
+  mov	ecx, 0
+	_next:
+	  mov	ebx, 10
+	  cdq
+	  idiv	ebx
+	  add	edx, 48
+	  mov	[esi], edx
+	  cmp	eax, 0
+	  jg	_addFour
+  jmp	_print
+  _back:
 
-
-  call	writeint
-
-
-
-
+  pop	ecx
   add	edi, 4
-  loop	_letsPrintThis
+  mov	al, ','
+  call	WriteChar
+  mov	al, ' '
+  call	WriteChar
+  loop	_letsChangeThis
+  jmp	_end
 
+_addFour:
+  add	esi, 4
+  add	ecx, 4
+  jmp	_next
+
+_print:
+  mov	esi, [ebp + 20]
+  add	esi, ecx
+  mDisplayString esi
+
+  sub	ecx, 4
+  cmp	ecx, 0
+  jge	_print
+  jmp	_back
 
 
   ; need to change an integer to an ascii representation.
-
+  _end:
   pop	EBP						; Restore EBP.
-  RET	4						; Change this value to however much is pushed onto the stack before the procedure is called.
+  RET	16						; Change this value to however much is pushed onto the stack before the procedure is called.
 
 WriteVal	ENDP
 
