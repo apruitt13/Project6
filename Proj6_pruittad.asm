@@ -100,6 +100,10 @@ _getNumLoop:
   push	offset	enteredNums
   call	WriteVal
 
+  push	count
+  push	offset	numArray
+  call FindSum
+
 	Invoke ExitProcess,0	; exit to operating system
 main ENDP
 
@@ -333,13 +337,50 @@ _print:
   jge	_print
   jmp	_back
 
-
-  ; need to change an integer to an ascii representation.
   _end:
   pop	EBP						; Restore EBP.
   RET	16						; Change this value to however much is pushed onto the stack before the procedure is called.
 
 WriteVal	ENDP
+
+;----------------------------------------------------------------------------------------------------
+; Name: FindSum
+;
+; Displays the introduction 
+;
+; Preconditions: The only preconditions are that the variables need to be pushed onto the stack in
+; the correct order.
+;
+; Postconditions: EDX changed.
+;
+; Receives: 
+;	
+; 
+; Returns: None
+;----------------------------------------------------------------------------------------------------
+
+FindSum		Proc
+  PUSH	EBP						; Preserve EBP
+  mov	EBP, ESP				; Assign static stack-fram pointer.
+
+  mov	edx, 0
+  mov	edi, [ebp + 8]			; Move the first element of the array.
+  mov	ecx, [ebp + 12]
+  
+  _addNums:
+  mov	eax, [edi]
+  add	edx, eax
+  add	edi, 4
+  loop	_addNums
+  mov	eax, edx
+  call	WriteInt
+
+
+
+  pop	EBP						; Restore EBP.
+  RET	12						; Change this value to however much is pushed onto the stack before the procedure is called.
+
+FindSum		ENDP
 
 END main
 
