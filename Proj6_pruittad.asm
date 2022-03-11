@@ -58,6 +58,7 @@ ENDM
   wrongNum			byte	"ERROR: You did not enter a signed number or your number was too big.", 13, 10
 					byte	"Please try again: ", 0
   enteredNums		byte	"You entered the following numbers: ", 13, 10, 0
+  sumString			byte	"The sum of thse numbers is: ", 0
   stringLen			sdword	?	
   buffer			byte	21 DUP (0)
   bytesRead			sdword	?
@@ -66,6 +67,7 @@ ENDM
   enteredNum		sdword	?
   arrayPosition		sdword	0
   count				sDWORD   LENGTHOF numArray  ; debugging purposes
+  numSum			sdword	?
 
 
   
@@ -94,15 +96,24 @@ _getNumLoop:
   ;call	writeint
 
   call	crlf
-  push	offset	asciiArray
+  
   push	count
+  push	offset	asciiArray
   push	offset	numArray
   push	offset	enteredNums
   call	WriteVal
 
+  call	crlf
+  push	offset numSum
   push	count
   push	offset	numArray
-  call FindSum
+  call  FindSum
+
+  push	offset	asciiArray
+  push	offset	numSum
+  push	offset	sumString
+  call	WriteVal
+
 
 	Invoke ExitProcess,0	; exit to operating system
 main ENDP
@@ -188,7 +199,6 @@ _negative:
   pop	eax
   jl	_invalid
   mov	edx, 1				; Adds 1 to edx to indicate it's a negative number for later.
-  ;push	edx					; Preserve the 1
   loop	_getNumber
   
 ; If there is a positive sign at the beginning it's a valid number. Otherwise it's invalid.
@@ -270,15 +280,17 @@ ReadVal		ENDP
 WriteVal	Proc
   PUSH	EBP						; Preserve EBP
   mov	EBP, ESP				; Assign static stack-fram pointer.
-  mov	esi, [ebp + 20]			; Array to store values
+  mov	esi, [ebp + 16]			; Array to store values
 
   mDisplayString [ebp + 8]
 
-  mov	ecx, [ebp +16]			; Length of the array.
+  mov	ecx, 0
+  mov	ecx, [ebp +20]			; Length of the array.
   cmp	ecx, 10
   je	_itsAnArray
-  mov	ecx, 1
-  jmp	_letsChangeThis
+  mov	edi, [ebp + 12]			; The value to be printed when it's not an array.
+  mov	esi, [ebp + 16]			; Array to store value.
+  jmp	_letsChangeThisNum
 
 
 _itsAnArray:
@@ -300,7 +312,7 @@ _letsChangeThis:
 	  mov	[esi], edx
 	  cmp	eax, 0
 	  jg	_addFour
-  jmp	_print
+	  jmp	_print
   _back:
 
   pop	ecx
@@ -328,7 +340,7 @@ _negative:
   jmp	_next
 
 _print:
-  mov	esi, [ebp + 20]
+  mov	esi, [ebp + 16]
   add	esi, ecx
   mDisplayString esi
 
@@ -336,6 +348,57 @@ _print:
   cmp	ecx, 0
   jge	_print
   jmp	_back
+
+_letsChangeThisNum:
+  push	ecx
+  mov	eax, [edi]
+  mov	ecx, 0
+	_nextNum:
+	  cmp	eax, 0
+	  jl	_negativeNum
+	  mov	ebx, 10
+	  cdq
+	  idiv	ebx
+	  add	edx, 48
+	  mov	[esi], edx
+	  cmp	eax, 0
+	  jg	_addFourNum
+	  jmp	_printNum
+  _backNum:
+
+  pop	ecx
+  add	edi, 4
+  cmp	ecx, 1
+  je	_end
+  mov	al, ','
+  call	WriteChar
+  mov	al, ' '
+  call	WriteChar
+  loop	_letsChangeThisNum
+  jmp	_end
+
+_addFourNum:
+  add	esi, 4
+  add	ecx, 4
+  jmp	_nextNum
+
+_negativeNum:
+  neg	eax
+  push	eax
+  mov	al, '-'
+  call	writeChar
+  pop	eax
+  jmp	_nextNum
+
+_printNum:
+  mov	esi, [ebp + 16]
+  add	esi, ecx
+  mDisplayString esi
+
+  sub	ecx, 4
+  cmp	ecx, 0
+  jge	_printNum
+
 
   _end:
   pop	EBP						; Restore EBP.
@@ -372,13 +435,16 @@ FindSum		Proc
   add	edx, eax
   add	edi, 4
   loop	_addNums
-  mov	eax, edx
-  call	WriteInt
+  mov	eax, 0
+  mov	eax, [ebp + 16]
+  mov	[eax], edx
+
+
 
 
 
   pop	EBP						; Restore EBP.
-  RET	12						; Change this value to however much is pushed onto the stack before the procedure is called.
+  RET	16						; Change this value to however much is pushed onto the stack before the procedure is called.
 
 FindSum		ENDP
 
