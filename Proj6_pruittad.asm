@@ -55,14 +55,15 @@ ENDM
   enterNum			byte	"Please enter a signed number: ", 0
   wrongNum			byte	"ERROR: You did not enter a signed number or your number was too big.", 13, 10
 					byte	"Please try again: ", 0
+  enteredNums		byte	"You entered the following numbers: ", 13, 10, 0
   stringLen			sdword	?	
   buffer			byte	21 DUP (0)
   bytesRead			sdword	?
   inString			byte	CHARACTERSIZE dup(?)
 
   enteredNum		sdword	?
-  loopCount			sdword	10
-  count     DWORD       LENGTHOF numArray  ; debugging purposes
+  arrayPosition		sdword	0
+  count				sDWORD   LENGTHOF numArray  ; debugging purposes
 
 
   
@@ -77,18 +78,23 @@ main PROC
 
   mov	ecx, 10
 _getNumLoop:
+  push	arrayPosition
   push	offset	numArray
   push	offset	wrongNum
   push	offset	bytesRead
   push	offset	inString
   push	offset	enterNum
   call	ReadVal
+  add	arrayPosition, 4
   loop _getNumLoop
 
   ;mov	eax, count					;debugging
   ;call	writeint
 
+  call	crlf
+  push	count
   push	offset	numArray
+  push	offset	enteredNums
   call	WriteVal
 
 	Invoke ExitProcess,0	; exit to operating system
@@ -220,19 +226,21 @@ _isNegative:
 
 
 _addToArray:
-
+  mov	edx, [ebp + 28]
   mov	eax, [ebp + 24]
+  add	eax, edx
   mov	[eax], edi
   ;mov	edi, [eax]		; Debugging purposes printed out the number.
   ;mov	eax, edi
   ;call	writeint
-  add	eax, 4
+
+
 
 
 ; add the number to the array.
   pop   ecx
   pop	EBP						; Restore EBP.
-  RET	24						; Change this value to however much is pushed onto the stack before the procedure is called.
+  RET	28						; Change this value to however much is pushed onto the stack before the procedure is called.
 
 ReadVal		ENDP
 
@@ -255,6 +263,38 @@ ReadVal		ENDP
 WriteVal	Proc
   PUSH	EBP						; Preserve EBP
   mov	EBP, ESP				; Assign static stack-fram pointer.
+
+  mDisplayString [ebp + 8]
+
+  mov	ecx, [ebp +16]			; Length of the array.
+  cmp	ecx, 10
+  je	_itsAnArray
+  mov	ecx, 0
+  jmp	_letsPrintThis
+
+
+_itsAnArray:
+  mov	ecx, 10
+  mov	edi, [ebp + 12]			; Move the first element of the array.
+  jmp	_letsPrintThis
+
+_letsPrintThis:
+  
+  mov	eax, [edi]
+  idiv	10
+  add	edx, 48
+  mov	esi, edx
+
+
+  call	writeint
+
+
+
+
+  add	edi, 4
+  loop	_letsPrintThis
+
+
 
   ; need to change an integer to an ascii representation.
 
