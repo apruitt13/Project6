@@ -12,6 +12,7 @@ INCLUDE Irvine32.inc
 
 ; Macros
   mGetString macro numPrompt, count, numEntered, byteRead
+	push	edx
 	mov		edx, numPrompt
 	call	WriteString
 	mov		edx, numEntered
@@ -19,6 +20,7 @@ INCLUDE Irvine32.inc
 	call	ReadString
 	mov		[numEntered], edx
 	mov		[byteRead], EAX
+	pop		edx
   
 ENDM
   ; Needs to display a prompt by reference. 
@@ -59,6 +61,8 @@ ENDM
   inString			byte	CHARACTERSIZE dup(?)
 
   enteredNum		sdword	?
+  loopCount			sdword	10
+  count     DWORD       LENGTHOF numArray  ; debugging purposes
 
 
   
@@ -73,18 +77,19 @@ main PROC
 
   mov	ecx, 10
 _getNumLoop:
-  push  ecx
-
-
   push	offset	numArray
   push	offset	wrongNum
   push	offset	bytesRead
   push	offset	inString
   push	offset	enterNum
   call	ReadVal
-  pop ecx
   loop _getNumLoop
 
+  ;mov	eax, count					;debugging
+  ;call	writeint
+
+  push	offset	numArray
+  call	WriteVal
 
 	Invoke ExitProcess,0	; exit to operating system
 main ENDP
@@ -134,23 +139,21 @@ Intro	ENDP
 ReadVal	Proc
   PUSH	EBP						; Preserve EBP
   mov	EBP, ESP				; Assign static stack-fram pointer.
-  push	edi
+  push  ecx						; Saving the loop count.
+  
   mov	edi, 0				; This is going to be my integer
-
+  mov	edx, 0				; Make sure this is cleared or it will make some of the integers negative.
 
 _start:
   mGetString [ebp+8], CHARACTERSIZE, [ebp+12], [ebp+16]
-
   mov	eax, [ebp+16]		; The number of bytes read.
   mov	esi, [ebp+12]		; Storing the string that was entered into esi.
 
-
   cld
-
-
   mov	ecx, eax
-
-_getNumber:			; Right now it is looping too many times. It is going past the end. I need to check the number in ECX to see what's wrong. It needs to be the string length.
+  cmp	ecx, 11				; Checking if the number is too large.
+  jg	_invalid
+_getNumber:			
   xor	eax, eax
 LODSB
   ; I also need to check if the first number is a negative number or positive. But only the first time. Otherwise it's an invalid number.
@@ -172,7 +175,7 @@ _negative:
   pop	eax
   jl	_invalid
   mov	edx, 1				; Adds 1 to edx to indicate it's a negative number for later.
-  push	edx					; Preserve the 1
+  ;push	edx					; Preserve the 1
   loop	_getNumber
   
 ; If there is a positive sign at the beginning it's a valid number. Otherwise it's invalid.
@@ -187,60 +190,47 @@ _invalid:
   mGetString [ebp+20], CHARACTERSIZE, [ebp+12], [ebp+16]		; If it's an invalid number it prints a different statement and counts the string again.
   mov	eax, [ebp+16]
   mov	esi, [ebp+12]
-
   mov	ecx, eax
   jmp	_getNumber
 
 ; converting the string to a number.
 _convert:
-  push  eax						; Saving the value in eax. This is the ascii value
 
+  push  eax						; Saving the value in eax. This is the ascii value
+  push	edx						; Saving if it's negative.
   sub	eax, 48					; Subtracting 48 from it.
   mov	ebx, eax				; Moving it to ebp.
   mov	eax, 10					; Moving 10 to eax to multiply.
   mul	edi						; edi is where the number is stored. Starts at 0. Multiply that by 10.
   mov	edi, eax				; Updating edi.
   add	edi, ebx				; Add edi to the amount when 48 subtracted from it.
- 
-
-  pop	eax
+  pop	edx						; Restoring the negative indicator.
+  pop	eax						; Restoring eax.
   loop	_getNumber
-; check if it was zero and multiply by zero if it was
-  pop	edx
-  cmp	edx, 1
 
+; Checking to see if the the value had a negative sign.
+  cmp	edx, 1
   je	_isNegative
- 
   jmp	_addToArray
 
+; If it's negative it is negated.
 _isNegative:
-pop	edi 
   neg	edi
-
   jmp	_addToArray
 
 
 _addToArray:
-  ;mov	eax, [ebp + 28]
-  ;mov	[eax], edi
-  ;mov	edi, [eax]
-   
- ; push eax
 
   mov	eax, [ebp + 24]
   mov	[eax], edi
-  mov	edi, [eax]
-  mov	eax, edi
-  call	writeint
-
+  ;mov	edi, [eax]		; Debugging purposes printed out the number.
+  ;mov	eax, edi
+  ;call	writeint
   add	eax, 4
 
 
 ; add the number to the array.
-
-
-
-
+  pop   ecx
   pop	EBP						; Restore EBP.
   RET	24						; Change this value to however much is pushed onto the stack before the procedure is called.
 
@@ -248,7 +238,7 @@ ReadVal		ENDP
 
 
 ;----------------------------------------------------------------------------------------------------
-; Name: intro
+; Name: writeVal
 ;
 ; Displays the introduction 
 ;
