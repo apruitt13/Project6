@@ -37,13 +37,13 @@ ENDM
 
 
 ; (insert constant definitions here)
-  ARRAYSIZE = 5
+  ARRAYSIZE = 10
   CHARACTERSIZE	= 20
   
 
 .data
  
-  numArray			dword	ARRAYSIZE DUP(?)
+  numArray			sdword	ARRAYSIZE DUP(?)
 
   intro1			byte	"PROGRAMMING ASSIGNMENT 6: Designing low-level I/O procedures", 13, 10
 					byte	"Written by: Adam Pruitt", 13, 10, 13, 10
@@ -57,7 +57,8 @@ ENDM
   buffer			byte	21 DUP (0)
   bytesRead			dword	?
   inString			byte	CHARACTERSIZE dup(?)
-  isNegative		dword	?
+
+  enteredNum		sdword	?
 
 
   
@@ -73,6 +74,9 @@ main PROC
   mov	ecx, 10
 _getNumLoop:
   push  ecx
+
+  push	offset	enteredNum
+  push	offset	numArray
   push	offset	wrongNum
   push	offset	bytesRead
   push	offset	inString
@@ -132,6 +136,7 @@ ReadVal	Proc
   mov	EBP, ESP				; Assign static stack-fram pointer.
   mov	edi, 0				; This is going to be my integer
 
+
 _start:
   mGetString [ebp+8], CHARACTERSIZE, [ebp+12], [ebp+16]
 
@@ -187,26 +192,46 @@ _invalid:
 
 ; converting the string to a number.
 _convert:
-  push  eax
-  sub	eax, 48
-  mov	ebp, eax
-  mov	eax, 10
-  mul	edi
-  mov	edi, eax
-  add	edi, ebp
+  push  eax						; Saving the value in eax. This is the ascii value
+  push	ebp
+  sub	eax, 48					; Subtracting 48 from it.
+  mov	ebp, eax				; Moving it to ebp.
+  mov	eax, 10					; Moving 10 to eax to multiply.
+  mul	edi						; edi is where the number is stored. Starts at 0. Multiply that by 10.
+  mov	edi, eax				; Updating edi.
+  add	edi, ebp				; Add edi to the amount when 48 subtracted from it.
 
-  
-
-  
+  pop	ebp
   pop	eax
   loop	_getNumber
 ; check if it was zero and multiply by zero if it was
   pop	edx
+  cmp	edx, 1
+  je	_isNegative
+  jmp	_addToArray
+
+_isNegative:
+
+  neg	edi
+  jmp	_addToArray
+
+
+_addToArray:
+  mov	eax, [ebp + 28]
+  mov	[eax], edi
+  mov	edi, [eax]
+  
+
+  mov	[ebp + 24], edi
+  mov	eax, [ebp + 24] ; checking the number by writing it. Can be deleted.
+  call	writeint
+  ;mov	[eax], edi
+  ;mov	edi, [eax]
 ; add the number to the array.
 
 
   pop	EBP						; Restore EBP.
-  RET	16						; Change this value to however much is pushed onto the stack before the procedure is called.
+  RET	20						; Change this value to however much is pushed onto the stack before the procedure is called.
 
 ReadVal		ENDP
 
