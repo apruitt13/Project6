@@ -41,7 +41,7 @@ ENDM
 ; (insert constant definitions here)
   ARRAYSIZE = 10
   CHARACTERSIZE	= 20
-  ASCIIARRAYSIZE = 100
+  ASCIIARRAYSIZE = 20
   
 
 .data
@@ -373,20 +373,15 @@ _printNum:
   stosb
   mov	edx, eax
   mov	edx, [ebp + 8]
- 
-
-
-  
-
   loop	_printNum
   mDisplayString edx
-
   mov	al, ','
   call	WriteChar
   mov	al, ' '
   call	WriteChar
   mov	eax, 0
   stosb
+
 
   _end:
 

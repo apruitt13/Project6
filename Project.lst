@@ -1,4 +1,4 @@
-Microsoft (R) Macro Assembler Version 14.29.30138.0	    03/12/22 12:59:34
+Microsoft (R) Macro Assembler Version 14.29.30138.0	    03/12/22 13:13:33
 "Project 6     (Proj6_pruittad.asm			     Page 1 - 1
 
 
@@ -62,7 +62,7 @@ Microsoft (R) Macro Assembler Version 14.29.30138.0	    03/12/22 12:59:34
 				; (insert constant definitions here)
  = 0000000A			  ARRAYSIZE = 10
  = 00000014			  CHARACTERSIZE	= 20
- = 00000064			  ASCIIARRAYSIZE = 100
+ = 00000014			  ASCIIARRAYSIZE = 20
 				  
 
  00000000			.data
@@ -70,11 +70,11 @@ Microsoft (R) Macro Assembler Version 14.29.30138.0	    03/12/22 12:59:34
  00000000  0000000A [		  numArray			sdword	ARRAYSIZE DUP(?)
 	    00000000
 	   ]
- 00000028  00000064 [		  asciiArray		byte	ASCIIARRAYSIZE DUP(?)
+ 00000028  00000014 [		  asciiArray		byte	ASCIIARRAYSIZE DUP(?)
 	    00
 	   ]
 
- 0000008C 50 52 4F 47 52	  intro1			byte	"PROGRAMMING ASSIGNMENT 6: Designing low-level I/O procedures", 13, 10
+ 0000003C 50 52 4F 47 52	  intro1			byte	"PROGRAMMING ASSIGNMENT 6: Designing low-level I/O procedures", 13, 10
 	   41 4D 4D 49 4E
 	   47 20 41 53 53
 	   49 47 4E 4D 45
@@ -87,13 +87,13 @@ Microsoft (R) Macro Assembler Version 14.29.30138.0	    03/12/22 12:59:34
 	   70 72 6F 63 65
 	   64 75 72 65 73
 	   0D 0A
- 000000CA  57 72 69 74 74						byte	"Written by: Adam Pruitt", 13, 10, 13, 10
+ 0000007A  57 72 69 74 74						byte	"Written by: Adam Pruitt", 13, 10, 13, 10
 	   65 6E 20 62 79
 	   3A 20 41 64 61
 	   6D 20 50 72 75
 	   69 74 74 0D 0A
 	   0D 0A
- 000000E5  50 6C 65 61 73						byte	"Please provide 10 signed decimal integers.", 13, 10
+ 00000095  50 6C 65 61 73						byte	"Please provide 10 signed decimal integers.", 13, 10
 	   65 20 70 72 6F
 	   76 69 64 65 20
 	   31 30 20 73 69
@@ -102,7 +102,7 @@ Microsoft (R) Macro Assembler Version 14.29.30138.0	    03/12/22 12:59:34
 	   61 6C 20 69 6E
 	   74 65 67 65 72
 	   73 2E 0D 0A
- 00000111  45 61 63 68 20						byte	"Each number needs to be small enough to fit inside a 32 bit register. After you have finished inputting", 13, 10
+ 000000C1  45 61 63 68 20						byte	"Each number needs to be small enough to fit inside a 32 bit register. After you have finished inputting", 13, 10
 	   6E 75 6D 62 65
 	   72 20 6E 65 65
 	   64 73 20 74 6F
@@ -123,7 +123,7 @@ Microsoft (R) Macro Assembler Version 14.29.30138.0	    03/12/22 12:59:34
 	   68 65 64 20 69
 	   6E 70 75 74 74
 	   69 6E 67 0D 0A
- 0000017A  74 68 65 20 72						byte	"the raw numbers I will display a list of the integers, their sum, and their average value.", 13, 10, 13, 10, 0
+ 0000012A  74 68 65 20 72						byte	"the raw numbers I will display a list of the integers, their sum, and their average value.", 13, 10, 13, 10, 0
 	   61 77 20 6E 75
 	   6D 62 65 72 73
 	   20 49 20 77 69
@@ -142,14 +142,14 @@ Microsoft (R) Macro Assembler Version 14.29.30138.0	    03/12/22 12:59:34
 	   61 67 65 20 76
 	   61 6C 75 65 2E
 	   0D 0A 0D 0A 00
- 000001D9 50 6C 65 61 73	  enterNum			byte	"Please enter a signed number: ", 0
+ 00000189 50 6C 65 61 73	  enterNum			byte	"Please enter a signed number: ", 0
 	   65 20 65 6E 74
 	   65 72 20 61 20
 	   73 69 67 6E 65
 	   64 20 6E 75 6D
 	   62 65 72 3A 20
 	   00
- 000001F8 45 52 52 4F 52	  wrongNum			byte	"ERROR: You did not enter a signed number or your number was too big.", 13, 10
+ 000001A8 45 52 52 4F 52	  wrongNum			byte	"ERROR: You did not enter a signed number or your number was too big.", 13, 10
 	   3A 20 59 6F 75
 	   20 64 69 64 20
 	   6E 6F 74 20 65
@@ -163,11 +163,11 @@ Microsoft (R) Macro Assembler Version 14.29.30138.0	    03/12/22 12:59:34
 	   20 77 61 73 20
 	   74 6F 6F 20 62
 	   69 67 2E 0D 0A
- 0000023E  50 6C 65 61 73						byte	"Please try again: ", 0
+ 000001EE  50 6C 65 61 73						byte	"Please try again: ", 0
 	   65 20 74 72 79
 	   20 61 67 61 69
 	   6E 3A 20 00
- 00000251 59 6F 75 20 65	  enteredNums		byte	"You entered the following numbers: ", 13, 10, 0
+ 00000201 59 6F 75 20 65	  enteredNums		byte	"You entered the following numbers: ", 13, 10, 0
 	   6E 74 65 72 65
 	   64 20 74 68 65
 	   20 66 6F 6C 6C
@@ -175,33 +175,33 @@ Microsoft (R) Macro Assembler Version 14.29.30138.0	    03/12/22 12:59:34
 	   20 6E 75 6D 62
 	   65 72 73 3A 20
 	   0D 0A 00
- 00000277 54 68 65 20 73	  sumString			byte	"The sum of thse numbers is: ", 0
+ 00000227 54 68 65 20 73	  sumString			byte	"The sum of thse numbers is: ", 0
 	   75 6D 20 6F 66
 	   20 74 68 73 65
 	   20 6E 75 6D 62
 	   65 72 73 20 69
 	   73 3A 20 00
- 00000294 54 68 65 20 74	  averageString		byte	"The truncated average is: ", 0
+ 00000244 54 68 65 20 74	  averageString		byte	"The truncated average is: ", 0
 	   72 75 6E 63 61
 	   74 65 64 20 61
 	   76 65 72 61 67
 	   65 20 69 73 3A
 	   20 00
- 000002AF 00000000		  stringLen			sdword	?	
- 000002B3  00000015 [		  buffer			byte	21 DUP (0)
+ 0000025F 00000000		  stringLen			sdword	?	
+ 00000263  00000015 [		  buffer			byte	21 DUP (0)
 	    00
 	   ]
- 000002C8 00000000		  bytesRead			sdword	?
- 000002CC  00000014 [		  inString			byte	CHARACTERSIZE dup(?)
+ 00000278 00000000		  bytesRead			sdword	?
+ 0000027C  00000014 [		  inString			byte	CHARACTERSIZE dup(?)
 	    00
 	   ]
 
- 000002E0 00000000		  enteredNum		sdword	?
- 000002E4 00000000		  arrayPosition		sdword	0
- 000002E8 0000000A		  count				sDWORD   LENGTHOF numArray  ; debugging purposes
- 000002EC 00000000		  numSum			sdword	?
- 000002F0 00000000		  numAverage		sdword	?
- 000002F4 00000064		  lengthAscii		sdword	LENGTHOF  asciiArray
+ 00000290 00000000		  enteredNum		sdword	?
+ 00000294 00000000		  arrayPosition		sdword	0
+ 00000298 0000000A		  count				sDWORD   LENGTHOF numArray  ; debugging purposes
+ 0000029C 00000000		  numSum			sdword	?
+ 000002A0 00000000		  numAverage		sdword	?
+ 000002A4 00000014		  lengthAscii		sdword	LENGTHOF  asciiArray
 
 
 				  
@@ -211,43 +211,43 @@ Microsoft (R) Macro Assembler Version 14.29.30138.0	    03/12/22 12:59:34
  00000000			.code
  00000000			main PROC
 
- 00000000  68 0000008C R	  push	offset intro1
+ 00000000  68 0000003C R	  push	offset intro1
  00000005  E8 00000086		  call	Intro
 
  0000000A  B9 0000000A		  mov	ecx, 10
  0000000F			_getNumLoop:
- 0000000F  FF 35 000002E4 R	  push	arrayPosition
+ 0000000F  FF 35 00000294 R	  push	arrayPosition
  00000015  68 00000000 R	  push	offset	numArray
- 0000001A  68 000001F8 R	  push	offset	wrongNum
- 0000001F  68 000002C8 R	  push	offset	bytesRead
- 00000024  68 000002CC R	  push	offset	inString
- 00000029  68 000001D9 R	  push	offset	enterNum
+ 0000001A  68 000001A8 R	  push	offset	wrongNum
+ 0000001F  68 00000278 R	  push	offset	bytesRead
+ 00000024  68 0000027C R	  push	offset	inString
+ 00000029  68 00000189 R	  push	offset	enterNum
  0000002E  E8 00000070		  call	ReadVal
- 00000033  83 05 000002E4 R	  add	arrayPosition, 4
+ 00000033  83 05 00000294 R	  add	arrayPosition, 4
 	   04
  0000003A  E2 D3		  loop _getNumLoop
 
  0000003C  E8 00000000 E	  call	crlf
 
 
- 00000041  FF 35 000002E8 R	  push	count
+ 00000041  FF 35 00000298 R	  push	count
  00000047  68 00000028 R	  push	offset	asciiArray
  0000004C  68 00000000 R	  push	offset	numArray
- 00000051  68 00000251 R	  push	offset	enteredNums
+ 00000051  68 00000201 R	  push	offset	enteredNums
  00000056  E8 0000010F		  call	PrintArray
 				  
 
 				  ;Finding the sum
  0000005B  E8 00000000 E	  call	crlf
- 00000060  68 000002EC R	  push	offset numSum
- 00000065  FF 35 000002E8 R	  push	count
+ 00000060  68 0000029C R	  push	offset numSum
+ 00000065  FF 35 00000298 R	  push	count
  0000006B  68 00000000 R	  push	offset	numArray
  00000070  E8 00000183		  call  FindSum
 
 
- 00000075  68 000002F0 R	  push	offset	numAverage
- 0000007A  68 000002EC R	  push	offset	numSum
- 0000007F  68 00000294 R	  push	offset	averageString
+ 00000075  68 000002A0 R	  push	offset	numAverage
+ 0000007A  68 0000029C R	  push	offset	numSum
+ 0000007F  68 00000244 R	  push	offset	averageString
  00000084  E8 00000196		  call	FindAverage
 
 
@@ -453,7 +453,7 @@ Microsoft (R) Macro Assembler Version 14.29.30138.0	    03/12/22 12:59:34
  0000016F  8B 55 08	     1		mov		EDX, [ebp + 8]
  00000172  E8 00000000 E     1		call	WriteString					; Prints whatever string is passed to it.
  00000177  5A		     1		pop		EDX
- 00000178  B9 00000000  mov	ecx, 0
+ 00000178  B9 00000000		  mov	ecx, 0
 
  0000017D  8B 7D 10		  mov	edi, [ebp + 16]			; Array to store values
  00000180  8B 75 0C		  mov	esi, [ebp + 12]			; Move the first element of the array.
@@ -533,24 +533,21 @@ Microsoft (R) Macro Assembler Version 14.29.30138.0	    03/12/22 12:59:34
  000001D0  AA			  stosb
  000001D1  8B D0		  mov	edx, eax
  000001D3  8B 55 08		  mov	edx, [ebp + 8]
-				 
-
-
-				  
-
+				  pop
+Proj6_pruittad.asm(376) : error A2008:syntax error : in instruction
  000001D6  E2 F7		  loop	_printNum
 				  mDisplayString edx
  000001D8  52		     1		push	EDX
  000001D9  8B D2	     1		mov		EDX, edx
  000001DB  E8 00000000 E     1		call	WriteString					; Prints whatever string is passed to it.
  000001E0  5A		     1		pop		EDX
-
  000001E1  B0 2C		  mov	al, ','
  000001E3  E8 00000000 E	  call	WriteChar
  000001E8  B0 20		  mov	al, ' '
  000001EA  E8 00000000 E	  call	WriteChar
  000001EF  B8 00000000		  mov	eax, 0
  000001F4  AA			  stosb
+
 
  000001F5			  _end:
 
@@ -662,7 +659,7 @@ Microsoft (R) Macro Assembler Version 14.29.30138.0	    03/12/22 12:59:34
 
 				END main
 
-Microsoft (R) Macro Assembler Version 14.29.30138.0	    03/12/22 12:59:34
+Microsoft (R) Macro Assembler Version 14.29.30138.0	    03/12/22 13:13:33
 "Project 6     (Proj6_pruittad.asm			     Symbols 2 - 1
 
 
@@ -764,7 +761,7 @@ Segments and Groups:
 
 FLAT . . . . . . . . . . . . . .	GROUP
 STACK  . . . . . . . . . . . . .	32 Bit	 00001000 Para	  Stack	  'STACK'	 
-_DATA  . . . . . . . . . . . . .	32 Bit	 000002F8 Para	  Public  'DATA'	
+_DATA  . . . . . . . . . . . . .	32 Bit	 000002A8 Para	  Public  'DATA'	
 _TEXT  . . . . . . . . . . . . .	32 Bit	 00000257 Para	  Public  'CODE'	
 
 
@@ -919,7 +916,7 @@ Symbols:
 @stack . . . . . . . . . . . . .	Text   	 FLAT
 ALT_MASK . . . . . . . . . . . .	Number	 00000003h   
 ARRAYSIZE  . . . . . . . . . . .	Number	 0000000Ah   
-ASCIIARRAYSIZE . . . . . . . . .	Number	 00000064h   
+ASCIIARRAYSIZE . . . . . . . . .	Number	 00000014h   
 CAPSLOCK_ON  . . . . . . . . . .	Number	 00000080h   
 CHARACTERSIZE  . . . . . . . . .	Number	 00000014h   
 CREATE_ALWAYS  . . . . . . . . .	Number	 00000002h   
@@ -1120,25 +1117,25 @@ VK_UP  . . . . . . . . . . . . .	Number	 00000026h
 WINDOW_BUFFER_SIZE_EVENT . . . .	Number	 00000004h   
 WriteConsoleOutputCharacter  . .	Text   	 WriteConsoleOutputCharacterA
 WriteConsole . . . . . . . . . .	Text   	 WriteConsoleA
-arrayPosition  . . . . . . . . .	DWord	 000002E4 _DATA	
+arrayPosition  . . . . . . . . .	DWord	 00000294 _DATA	
 asciiArray . . . . . . . . . . .	Byte	 00000028 _DATA	
-averageString  . . . . . . . . .	Byte	 00000294 _DATA	
+averageString  . . . . . . . . .	Byte	 00000244 _DATA	
 black  . . . . . . . . . . . . .	Number	 00000000h   
 blue . . . . . . . . . . . . . .	Number	 00000001h   
 brown  . . . . . . . . . . . . .	Number	 00000006h   
-buffer . . . . . . . . . . . . .	Byte	 000002B3 _DATA	
-bytesRead  . . . . . . . . . . .	DWord	 000002C8 _DATA	
-count  . . . . . . . . . . . . .	DWord	 000002E8 _DATA	
+buffer . . . . . . . . . . . . .	Byte	 00000263 _DATA	
+bytesRead  . . . . . . . . . . .	DWord	 00000278 _DATA	
+count  . . . . . . . . . . . . .	DWord	 00000298 _DATA	
 cyan . . . . . . . . . . . . . .	Number	 00000003h   
-enterNum . . . . . . . . . . . .	Byte	 000001D9 _DATA	
-enteredNums  . . . . . . . . . .	Byte	 00000251 _DATA	
-enteredNum . . . . . . . . . . .	DWord	 000002E0 _DATA	
+enterNum . . . . . . . . . . . .	Byte	 00000189 _DATA	
+enteredNums  . . . . . . . . . .	Byte	 00000201 _DATA	
+enteredNum . . . . . . . . . . .	DWord	 00000290 _DATA	
 exit . . . . . . . . . . . . . .	Text   	 INVOKE ExitProcess,0
 gray . . . . . . . . . . . . . .	Number	 00000008h   
 green  . . . . . . . . . . . . .	Number	 00000002h   
-inString . . . . . . . . . . . .	Byte	 000002CC _DATA	
-intro1 . . . . . . . . . . . . .	Byte	 0000008C _DATA	
-lengthAscii  . . . . . . . . . .	DWord	 000002F4 _DATA	
+inString . . . . . . . . . . . .	Byte	 0000027C _DATA	
+intro1 . . . . . . . . . . . . .	Byte	 0000003C _DATA	
+lengthAscii  . . . . . . . . . .	DWord	 000002A4 _DATA	
 lightBlue  . . . . . . . . . . .	Number	 00000009h   
 lightCyan  . . . . . . . . . . .	Number	 0000000Bh   
 lightGray  . . . . . . . . . . .	Number	 00000007h   
@@ -1147,15 +1144,15 @@ lightMagenta . . . . . . . . . .	Number	 0000000Dh
 lightRed . . . . . . . . . . . .	Number	 0000000Ch   
 magenta  . . . . . . . . . . . .	Number	 00000005h   
 numArray . . . . . . . . . . . .	DWord	 00000000 _DATA	
-numAverage . . . . . . . . . . .	DWord	 000002F0 _DATA	
-numSum . . . . . . . . . . . . .	DWord	 000002EC _DATA	
+numAverage . . . . . . . . . . .	DWord	 000002A0 _DATA	
+numSum . . . . . . . . . . . . .	DWord	 0000029C _DATA	
 red  . . . . . . . . . . . . . .	Number	 00000004h   
-stringLen  . . . . . . . . . . .	DWord	 000002AF _DATA	
-sumString  . . . . . . . . . . .	Byte	 00000277 _DATA	
+stringLen  . . . . . . . . . . .	DWord	 0000025F _DATA	
+sumString  . . . . . . . . . . .	Byte	 00000227 _DATA	
 white  . . . . . . . . . . . . .	Number	 0000000Fh   
-wrongNum . . . . . . . . . . . .	Byte	 000001F8 _DATA	
+wrongNum . . . . . . . . . . . .	Byte	 000001A8 _DATA	
 wsprintf . . . . . . . . . . . .	Text   	 wsprintfA
 yellow . . . . . . . . . . . . .	Number	 0000000Eh   
 
 	   0 Warnings
-	   0 Errors
+	   1 Errors
