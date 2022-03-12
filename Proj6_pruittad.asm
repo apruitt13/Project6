@@ -41,13 +41,13 @@ ENDM
 ; (insert constant definitions here)
   ARRAYSIZE = 10
   CHARACTERSIZE	= 20
-  ASCIIARRAYSIZE = 20
+  ASCIIARRAYSIZE = 100
   
 
 .data
  
   numArray			sdword	ARRAYSIZE DUP(?)
-  asciiArray		sdword	ASCIIARRAYSIZE DUP(?)
+  asciiArray		byte	ASCIIARRAYSIZE DUP(?)
 
   intro1			byte	"PROGRAMMING ASSIGNMENT 6: Designing low-level I/O procedures", 13, 10
 					byte	"Written by: Adam Pruitt", 13, 10, 13, 10
@@ -70,6 +70,7 @@ ENDM
   count				sDWORD   LENGTHOF numArray  ; debugging purposes
   numSum			sdword	?
   numAverage		sdword	?
+  lengthAscii		sdword	LENGTHOF  asciiArray
 
 
   
@@ -94,17 +95,15 @@ _getNumLoop:
   add	arrayPosition, 4
   loop _getNumLoop
 
-  ;mov	eax, count					;debugging
-  ;call	writeint
-
   call	crlf
-  
-  ;Printing out the array.
+
+
   push	count
   push	offset	asciiArray
   push	offset	numArray
   push	offset	enteredNums
-  call	WriteVal
+  call	PrintArray
+  
 
   ;Finding the sum
   call	crlf
@@ -113,22 +112,11 @@ _getNumLoop:
   push	offset	numArray
   call  FindSum
 
-  ; Printing the sum
-  push	offset	asciiArray
-  push	offset	numSum
-  push	offset	sumString
-  call	WriteVal
 
   push	offset	numAverage
   push	offset	numSum
   push	offset	averageString
   call	FindAverage
-
-
-  push	offset	asciiArray
-  push	offset	numAverage
-  push	offset	averageString
-  call	WriteVal
 
 
 	Invoke ExitProcess,0	; exit to operating system
@@ -154,9 +142,11 @@ main ENDP
 Intro	Proc
   PUSH	EBP						; Preserve EBP
   mov	EBP, ESP				; Assign static stack-fram pointer.
+  pushad
 
   mDisplayString [ebp+8]			; Prints intro1.
 
+  popad
   pop	EBP						; Restore EBP.
   RET	4
 Intro	ENDP
@@ -230,6 +220,8 @@ _invalid:
   mov	eax, [ebp+16]
   mov	esi, [ebp+12]
   mov	ecx, eax
+  cmp	ecx, 11				; Checking if the number is too large.
+  jg	_invalid
   jmp	_getNumber
 
 ; converting the string to a number.
@@ -279,6 +271,52 @@ ReadVal		ENDP
 
 
 ;----------------------------------------------------------------------------------------------------
+; Name: PrintArray
+;
+; Displays the introduction 
+;
+; Preconditions: The only preconditions are that the variables need to be pushed onto the stack in
+; the correct order.
+;
+; Postconditions: EDX changed.
+;
+; Receives: 
+;	
+; 
+; Returns: None
+;----------------------------------------------------------------------------------------------------
+
+PrintArray	Proc
+  PUSH	EBP						; Preserve EBP
+  mov	EBP, ESP				; Assign static stack-fram pointer.
+  pushad
+
+
+  mDisplayString [ebp + 8]		; Displays the string enteredNums
+  mov	ecx, 0
+
+  mov	edi, [ebp + 16]			; Array to store values
+  mov	esi, [ebp + 12]			; Move the first element of the array.
+  mov	ecx, 10
+  _printVal:
+  push	ecx
+  push	edi
+  ;push	esi
+  ; make sure to push and add.
+  call	writeVal
+  ;pop	esi
+  ;pop	edi
+  add	esi, 4
+  ;pop	ecx
+  loop	_printVal
+  
+  popad
+  pop	EBP						; Restore EBP.
+  RET	20						; Change this value to however much is pushed onto the stack before the procedure is called.
+  
+PrintArray	ENDP
+
+;----------------------------------------------------------------------------------------------------
 ; Name: writeVal
 ;
 ; Displays the introduction 
@@ -296,82 +334,14 @@ ReadVal		ENDP
 WriteVal	Proc
   PUSH	EBP						; Preserve EBP
   mov	EBP, ESP				; Assign static stack-fram pointer.
+  pushad
+  CLD
 
-
-
-  mDisplayString [ebp + 8]
-
-  mov	ecx, 0
-  mov	ecx, [ebp +20]			; Length of the array.
-  cmp	ecx, 10
-  je	_itsAnArray
-  mov	edi, [ebp + 12]			; The value to be printed when it's not an array.
-  mov	esi, [ebp + 16]			; Array to store value.
-  jmp	_letsChangeThisNum
-
-
-_itsAnArray:
-  mov	esi, [ebp + 16]			; Array to store values
-  mov	ecx, 10
-  mov	edi, [ebp + 12]			; Move the first element of the array.
-  jmp	_letsChangeThis
-
-_letsChangeThis:
-  push	ecx
-  mov	eax, [edi]
-  mov	ecx, 0
-	_next:
-	  cmp	eax, 0
-	  jl	_negative
-	  mov	ebx, 10
-	  cdq
-	  idiv	ebx
-	  add	edx, 48
-	  mov	[esi], edx
-	  cmp	eax, 0
-	  jg	_addFour
-	  jmp	_print
-  _back:
-
-  pop	ecx
-  add	edi, 4
-  cmp	ecx, 1
-  je	_end
-  mov	al, ','
-  call	WriteChar
-  mov	al, ' '
-  call	WriteChar
-  loop	_letsChangeThis
-  jmp	_end
-
-_addFour:
-  add	esi, 4
-  add	ecx, 4
-  jmp	_next
-
-_negative:
-  neg	eax
-  push	eax
-  mov	al, '-'
-  call	writeChar
-  pop	eax
-  jmp	_next
-
-_print:
-  mov	esi, [ebp + 16]
-  add	esi, ecx
-  mDisplayString esi
-
-  sub	ecx, 4
-  cmp	ecx, 0
-  jge	_print
-  jmp	_back
-
-; Where it jumps if it's not the array.
 _letsChangeThisNum:
-  push	ecx
-  mov	eax, [edi]
-  mov	ecx, 0
+  mov	eax, [esi]				; Move the value into eax
+  mov	ecx, 1
+
+
 	_nextNum:
 	  cmp	eax, 0
 	  jl	_negativeNum
@@ -379,27 +349,16 @@ _letsChangeThisNum:
 	  cdq
 	  idiv	ebx
 	  add	edx, 48
-	  mov	[esi], edx
+	  push  edx					; Move the remainder onto the stack
 	  cmp	eax, 0
-	  jg	_addFourNum
+	  jg	_addFourNum			; Continue converting the next number.
+	  ;mov	edi, [ebp + 8]
 	  jmp	_printNum
-  _backNum:
-
-  pop	ecx
-  add	edi, 4
-  cmp	ecx, 1
-  je	_endNum
-  mov	al, ','
-  call	WriteChar
-  mov	al, ' '
-  call	WriteChar
-  loop	_letsChangeThisNum
-  jmp	_endNum
 
 _addFourNum:
-  add	esi, 4
-  add	ecx, 4
+  add	ecx, 1
   jmp	_nextNum
+
 
 _negativeNum:
   neg	eax
@@ -407,29 +366,34 @@ _negativeNum:
   mov	al, '-'
   call	writeChar
   pop	eax
-  jmp	_nextNum
+  jmp	_nextNum  
 
 _printNum:
-  mov	esi, [ebp + 16]
-  add	esi, ecx
-  mDisplayString esi
+  pop	eax
+  stosb
+  mov	edx, eax
+  mov	edx, [ebp + 8]
+ 
 
-  sub	ecx, 4
-  cmp	ecx, 0
-  jge	_printNum
 
-  _endNum:
+  
 
-  pop	EBP						; Restore EBP.
-  RET	16						; Change this value to however much is pushed onto the stack before the procedure is called.
-  jmp	_final
+  loop	_printNum
+  mDisplayString edx
+
+  mov	al, ','
+  call	WriteChar
+  mov	al, ' '
+  call	WriteChar
+  mov	eax, 0
+  stosb
 
   _end:
 
+  popad
   pop	EBP						; Restore EBP.
-  RET	20						; Change this value to however much is pushed onto the stack before the procedure is called.
+  RET							; Change this value to however much is pushed onto the stack before the procedure is called.
   
-  _final:
 WriteVal	ENDP
 
 ;----------------------------------------------------------------------------------------------------
@@ -451,7 +415,7 @@ WriteVal	ENDP
 FindSum		Proc
   PUSH	EBP						; Preserve EBP
   mov	EBP, ESP				; Assign static stack-fram pointer.
-
+  pushad
 
   mov	edx, 0
   mov	edi, [ebp + 8]			; Move the first element of the array.
@@ -469,7 +433,7 @@ FindSum		Proc
 
 
 
-
+  popad
   pop	EBP						; Restore EBP.
   RET	16						; Change this value to however much is pushed onto the stack before the procedure is called.
 
@@ -496,7 +460,8 @@ FindSum		ENDP
 FindAverage		Proc
   PUSH	EBP						; Preserve EBP
   mov	EBP, ESP				; Assign static stack-fram pointer.
-  
+  pushad
+
   mDisplayString [ebp + 8]
 
   mov	edx, [ebp + 12]
@@ -521,6 +486,7 @@ FindAverage		Proc
 
   _end:
 
+  popad
   pop	EBP						; Restore EBP.
   RET	16						; Change this value to however much is pushed onto the stack before the procedure is called.
 
