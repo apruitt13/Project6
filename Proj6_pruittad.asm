@@ -99,18 +99,21 @@ _getNumLoop:
 
   call	crlf
   
+  ;Printing out the array.
   push	count
   push	offset	asciiArray
   push	offset	numArray
   push	offset	enteredNums
   call	WriteVal
 
+  ;Finding the sum
   call	crlf
   push	offset numSum
   push	count
   push	offset	numArray
   call  FindSum
 
+  ; Printing the sum
   push	offset	asciiArray
   push	offset	numSum
   push	offset	sumString
@@ -293,7 +296,8 @@ ReadVal		ENDP
 WriteVal	Proc
   PUSH	EBP						; Preserve EBP
   mov	EBP, ESP				; Assign static stack-fram pointer.
-  mov	esi, [ebp + 16]			; Array to store values
+
+
 
   mDisplayString [ebp + 8]
 
@@ -307,6 +311,7 @@ WriteVal	Proc
 
 
 _itsAnArray:
+  mov	esi, [ebp + 16]			; Array to store values
   mov	ecx, 10
   mov	edi, [ebp + 12]			; Move the first element of the array.
   jmp	_letsChangeThis
@@ -362,6 +367,7 @@ _print:
   jge	_print
   jmp	_back
 
+; Where it jumps if it's not the array.
 _letsChangeThisNum:
   push	ecx
   mov	eax, [edi]
@@ -382,13 +388,13 @@ _letsChangeThisNum:
   pop	ecx
   add	edi, 4
   cmp	ecx, 1
-  je	_end
+  je	_endNum
   mov	al, ','
   call	WriteChar
   mov	al, ' '
   call	WriteChar
   loop	_letsChangeThisNum
-  jmp	_end
+  jmp	_endNum
 
 _addFourNum:
   add	esi, 4
@@ -412,11 +418,18 @@ _printNum:
   cmp	ecx, 0
   jge	_printNum
 
+  _endNum:
 
-  _end:
   pop	EBP						; Restore EBP.
   RET	16						; Change this value to however much is pushed onto the stack before the procedure is called.
+  jmp	_final
 
+  _end:
+
+  pop	EBP						; Restore EBP.
+  RET	20						; Change this value to however much is pushed onto the stack before the procedure is called.
+  
+  _final:
 WriteVal	ENDP
 
 ;----------------------------------------------------------------------------------------------------
@@ -438,6 +451,7 @@ WriteVal	ENDP
 FindSum		Proc
   PUSH	EBP						; Preserve EBP
   mov	EBP, ESP				; Assign static stack-fram pointer.
+
 
   mov	edx, 0
   mov	edi, [ebp + 8]			; Move the first element of the array.

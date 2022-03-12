@@ -1,4 +1,4 @@
-Microsoft (R) Macro Assembler Version 14.29.30138.0	    03/11/22 17:29:41
+Microsoft (R) Macro Assembler Version 14.29.30138.0	    03/11/22 19:13:46
 "Project 6     (Proj6_pruittad.asm			     Page 1 - 1
 
 
@@ -231,18 +231,21 @@ Microsoft (R) Macro Assembler Version 14.29.30138.0	    03/11/22 17:29:41
 
  0000003C  E8 00000000 E	  call	crlf
 				  
+				  ;Printing out the array.
  00000041  FF 35 000002D4 R	  push	count
  00000047  68 00000028 R	  push	offset	asciiArray
  0000004C  68 00000000 R	  push	offset	numArray
  00000051  68 0000023D R	  push	offset	enteredNums
  00000056  E8 00000130		  call	WriteVal
 
+				  ;Finding the sum
  0000005B  E8 00000000 E	  call	crlf
  00000060  68 000002D8 R	  push	offset numSum
  00000065  FF 35 000002D4 R	  push	count
  0000006B  68 00000000 R	  push	offset	numArray
- 00000070  E8 00000220		  call  FindSum
+ 00000070  E8 00000229		  call  FindSum
 
+				  ; Printing the sum
  00000075  68 00000028 R	  push	offset	asciiArray
  0000007A  68 000002D8 R	  push	offset	numSum
  0000007F  68 00000263 R	  push	offset	sumString
@@ -251,7 +254,7 @@ Microsoft (R) Macro Assembler Version 14.29.30138.0	    03/11/22 17:29:41
  00000089  68 000002DC R	  push	offset	numAverage
  0000008E  68 000002D8 R	  push	offset	numSum
  00000093  68 00000280 R	  push	offset	averageString
- 00000098  E8 0000021D		  call	FindAverage
+ 00000098  E8 00000226		  call	FindAverage
 
 
  0000009D  68 00000028 R	  push	offset	asciiArray
@@ -449,143 +452,153 @@ Microsoft (R) Macro Assembler Version 14.29.30138.0	    03/11/22 17:29:41
  0000018B			WriteVal	Proc
  0000018B  55			  PUSH	EBP						; Preserve EBP
  0000018C  8B EC		  mov	EBP, ESP				; Assign static stack-fram pointer.
- 0000018E  8B 75 10		  mov	esi, [ebp + 16]			; Array to store values
+
+
 
 				  mDisplayString [ebp + 8]
- 00000191  52		     1		push	EDX
- 00000192  8B 55 08	     1		mov		EDX, [ebp + 8]
- 00000195  E8 00000000 E     1		call	WriteString					; Prints whatever string is passed to it.
- 0000019A  5A		     1		pop		EDX
+ 0000018E  52		     1		push	EDX
+ 0000018F  8B 55 08	     1		mov		EDX, [ebp + 8]
+ 00000192  E8 00000000 E     1		call	WriteString					; Prints whatever string is passed to it.
+ 00000197  5A		     1		pop		EDX
+ 00000198  51			  push	ecx
+ 00000199  B9 00000000		  mov	ecx, 0
+ 0000019E  8B 4D 14		  mov	ecx, [ebp +20]			; Length of the array.
+ 000001A1  83 F9 0A		  cmp	ecx, 10
+ 000001A4  74 08		  je	_itsAnArray
+ 000001A6  8B 7D 0C		  mov	edi, [ebp + 12]			; The value to be printed when it's not an array.
+ 000001A9  8B 75 10		  mov	esi, [ebp + 16]			; Array to store value.
+ 000001AC  EB 7D		  jmp	_letsChangeThisNum
 
- 0000019B  B9 00000000		  mov	ecx, 0
- 000001A0  8B 4D 14		  mov	ecx, [ebp +20]			; Length of the array.
- 000001A3  83 F9 0A		  cmp	ecx, 10
- 000001A6  74 08		  je	_itsAnArray
- 000001A8  8B 7D 0C		  mov	edi, [ebp + 12]			; The value to be printed when it's not an array.
- 000001AB  8B 75 10		  mov	esi, [ebp + 16]			; Array to store value.
- 000001AE  EB 7A		  jmp	_letsChangeThisNum
 
+ 000001AE			_itsAnArray:
+ 000001AE  8B 75 10		  mov	esi, [ebp + 16]			; Array to store values
+ 000001B1  B9 0000000A		  mov	ecx, 10
+ 000001B6  8B 7D 0C		  mov	edi, [ebp + 12]			; Move the first element of the array.
+ 000001B9  EB 00		  jmp	_letsChangeThis
 
- 000001B0			_itsAnArray:
- 000001B0  B9 0000000A		  mov	ecx, 10
- 000001B5  8B 7D 0C		  mov	edi, [ebp + 12]			; Move the first element of the array.
- 000001B8  EB 00		  jmp	_letsChangeThis
+ 000001BB			_letsChangeThis:
+ 000001BB  51			  push	ecx
+ 000001BC  8B 07		  mov	eax, [edi]
+ 000001BE  B9 00000000		  mov	ecx, 0
+ 000001C3				_next:
+ 000001C3  83 F8 00			  cmp	eax, 0
+ 000001C6  7C 3E			  jl	_negative
+ 000001C8  BB 0000000A			  mov	ebx, 10
+ 000001CD  99				  cdq
+ 000001CE  F7 FB			  idiv	ebx
+ 000001D0  83 C2 30			  add	edx, 48
+ 000001D3  89 16			  mov	[esi], edx
+ 000001D5  83 F8 00			  cmp	eax, 0
+ 000001D8  7F 24			  jg	_addFour
+ 000001DA  EB 37			  jmp	_print
+ 000001DC			  _back:
 
- 000001BA			_letsChangeThis:
- 000001BA  51			  push	ecx
- 000001BB  8B 07		  mov	eax, [edi]
- 000001BD  B9 00000000		  mov	ecx, 0
- 000001C2				_next:
- 000001C2  83 F8 00			  cmp	eax, 0
- 000001C5  7C 3E			  jl	_negative
- 000001C7  BB 0000000A			  mov	ebx, 10
- 000001CC  99				  cdq
- 000001CD  F7 FB			  idiv	ebx
- 000001CF  83 C2 30			  add	edx, 48
- 000001D2  89 16			  mov	[esi], edx
- 000001D4  83 F8 00			  cmp	eax, 0
- 000001D7  7F 24			  jg	_addFour
- 000001D9  EB 37			  jmp	_print
- 000001DB			  _back:
+ 000001DC  59			  pop	ecx
+ 000001DD  83 C7 04		  add	edi, 4
+ 000001E0  83 F9 01		  cmp	ecx, 1
+ 000001E3  0F 84 000000B0	  je	_end
+ 000001E9  B0 2C		  mov	al, ','
+ 000001EB  E8 00000000 E	  call	WriteChar
+ 000001F0  B0 20		  mov	al, ' '
+ 000001F2  E8 00000000 E	  call	WriteChar
+ 000001F7  E2 C2		  loop	_letsChangeThis
+ 000001F9  E9 0000009B		  jmp	_end
 
- 000001DB  59			  pop	ecx
- 000001DC  83 C7 04		  add	edi, 4
- 000001DF  83 F9 01		  cmp	ecx, 1
- 000001E2  0F 84 000000A9	  je	_end
- 000001E8  B0 2C		  mov	al, ','
- 000001EA  E8 00000000 E	  call	WriteChar
- 000001EF  B0 20		  mov	al, ' '
- 000001F1  E8 00000000 E	  call	WriteChar
- 000001F6  E2 C2		  loop	_letsChangeThis
- 000001F8  E9 00000094		  jmp	_end
+ 000001FE			_addFour:
+ 000001FE  83 C6 04		  add	esi, 4
+ 00000201  83 C1 04		  add	ecx, 4
+ 00000204  EB BD		  jmp	_next
 
- 000001FD			_addFour:
- 000001FD  83 C6 04		  add	esi, 4
- 00000200  83 C1 04		  add	ecx, 4
- 00000203  EB BD		  jmp	_next
+ 00000206			_negative:
+ 00000206  F7 D8		  neg	eax
+ 00000208  50			  push	eax
+ 00000209  B0 2D		  mov	al, '-'
+ 0000020B  E8 00000000 E	  call	writeChar
+ 00000210  58			  pop	eax
+ 00000211  EB B0		  jmp	_next
 
- 00000205			_negative:
- 00000205  F7 D8		  neg	eax
- 00000207  50			  push	eax
- 00000208  B0 2D		  mov	al, '-'
- 0000020A  E8 00000000 E	  call	writeChar
- 0000020F  58			  pop	eax
- 00000210  EB B0		  jmp	_next
-
- 00000212			_print:
- 00000212  8B 75 10		  mov	esi, [ebp + 16]
- 00000215  03 F1		  add	esi, ecx
+ 00000213			_print:
+ 00000213  8B 75 10		  mov	esi, [ebp + 16]
+ 00000216  03 F1		  add	esi, ecx
 				  mDisplayString esi
- 00000217  52		     1		push	EDX
- 00000218  8B D6	     1		mov		EDX, esi
- 0000021A  E8 00000000 E     1		call	WriteString					; Prints whatever string is passed to it.
- 0000021F  5A		     1		pop		EDX
+ 00000218  52		     1		push	EDX
+ 00000219  8B D6	     1		mov		EDX, esi
+ 0000021B  E8 00000000 E     1		call	WriteString					; Prints whatever string is passed to it.
+ 00000220  5A		     1		pop		EDX
 
- 00000220  83 E9 04		  sub	ecx, 4
- 00000223  83 F9 00		  cmp	ecx, 0
- 00000226  7D EA		  jge	_print
- 00000228  EB B1		  jmp	_back
+ 00000221  83 E9 04		  sub	ecx, 4
+ 00000224  83 F9 00		  cmp	ecx, 0
+ 00000227  7D EA		  jge	_print
+ 00000229  EB B1		  jmp	_back
 
- 0000022A			_letsChangeThisNum:
- 0000022A  51			  push	ecx
- 0000022B  8B 07		  mov	eax, [edi]
- 0000022D  B9 00000000		  mov	ecx, 0
- 00000232				_nextNum:
- 00000232  83 F8 00			  cmp	eax, 0
- 00000235  7C 37			  jl	_negativeNum
- 00000237  BB 0000000A			  mov	ebx, 10
- 0000023C  99				  cdq
- 0000023D  F7 FB			  idiv	ebx
- 0000023F  83 C2 30			  add	edx, 48
- 00000242  89 16			  mov	[esi], edx
- 00000244  83 F8 00			  cmp	eax, 0
- 00000247  7F 1D			  jg	_addFourNum
- 00000249  EB 30			  jmp	_printNum
- 0000024B			  _backNum:
+				; Where it jumps if it's not the array.
+ 0000022B			_letsChangeThisNum:
+ 0000022B  51			  push	ecx
+ 0000022C  8B 07		  mov	eax, [edi]
+ 0000022E  B9 00000000		  mov	ecx, 0
+ 00000233				_nextNum:
+ 00000233  83 F8 00			  cmp	eax, 0
+ 00000236  7C 37			  jl	_negativeNum
+ 00000238  BB 0000000A			  mov	ebx, 10
+ 0000023D  99				  cdq
+ 0000023E  F7 FB			  idiv	ebx
+ 00000240  83 C2 30			  add	edx, 48
+ 00000243  89 16			  mov	[esi], edx
+ 00000245  83 F8 00			  cmp	eax, 0
+ 00000248  7F 1D			  jg	_addFourNum
+ 0000024A  EB 30			  jmp	_printNum
+ 0000024C			  _backNum:
 
- 0000024B  59			  pop	ecx
- 0000024C  83 C7 04		  add	edi, 4
- 0000024F  83 F9 01		  cmp	ecx, 1
- 00000252  74 3D		  je	_end
- 00000254  B0 2C		  mov	al, ','
- 00000256  E8 00000000 E	  call	WriteChar
- 0000025B  B0 20		  mov	al, ' '
- 0000025D  E8 00000000 E	  call	WriteChar
- 00000262  E2 C6		  loop	_letsChangeThisNum
- 00000264  EB 2B		  jmp	_end
+ 0000024C  59			  pop	ecx
+ 0000024D  83 C7 04		  add	edi, 4
+ 00000250  83 F9 01		  cmp	ecx, 1
+ 00000253  74 3D		  je	_endNum
+ 00000255  B0 2C		  mov	al, ','
+ 00000257  E8 00000000 E	  call	WriteChar
+ 0000025C  B0 20		  mov	al, ' '
+ 0000025E  E8 00000000 E	  call	WriteChar
+ 00000263  E2 C6		  loop	_letsChangeThisNum
+ 00000265  EB 2B		  jmp	_endNum
 
- 00000266			_addFourNum:
- 00000266  83 C6 04		  add	esi, 4
- 00000269  83 C1 04		  add	ecx, 4
- 0000026C  EB C4		  jmp	_nextNum
+ 00000267			_addFourNum:
+ 00000267  83 C6 04		  add	esi, 4
+ 0000026A  83 C1 04		  add	ecx, 4
+ 0000026D  EB C4		  jmp	_nextNum
 
- 0000026E			_negativeNum:
- 0000026E  F7 D8		  neg	eax
- 00000270  50			  push	eax
- 00000271  B0 2D		  mov	al, '-'
- 00000273  E8 00000000 E	  call	writeChar
- 00000278  58			  pop	eax
- 00000279  EB B7		  jmp	_nextNum
+ 0000026F			_negativeNum:
+ 0000026F  F7 D8		  neg	eax
+ 00000271  50			  push	eax
+ 00000272  B0 2D		  mov	al, '-'
+ 00000274  E8 00000000 E	  call	writeChar
+ 00000279  58			  pop	eax
+ 0000027A  EB B7		  jmp	_nextNum
 
- 0000027B			_printNum:
- 0000027B  8B 75 10		  mov	esi, [ebp + 16]
- 0000027E  03 F1		  add	esi, ecx
+ 0000027C			_printNum:
+ 0000027C  8B 75 10		  mov	esi, [ebp + 16]
+ 0000027F  03 F1		  add	esi, ecx
 				  mDisplayString esi
- 00000280  52		     1		push	EDX
- 00000281  8B D6	     1		mov		EDX, esi
- 00000283  E8 00000000 E     1		call	WriteString					; Prints whatever string is passed to it.
- 00000288  5A		     1		pop		EDX
+ 00000281  52		     1		push	EDX
+ 00000282  8B D6	     1		mov		EDX, esi
+ 00000284  E8 00000000 E     1		call	WriteString					; Prints whatever string is passed to it.
+ 00000289  5A		     1		pop		EDX
 
- 00000289  83 E9 04		  sub	ecx, 4
- 0000028C  83 F9 00		  cmp	ecx, 0
- 0000028F  7D EA		  jge	_printNum
+ 0000028A  83 E9 04		  sub	ecx, 4
+ 0000028D  83 F9 00		  cmp	ecx, 0
+ 00000290  7D EA		  jge	_printNum
 
+ 00000292			  _endNum:
+ 00000292  59			  pop	ecx
+ 00000293  5D			  pop	EBP						; Restore EBP.
+ 00000294  C2 0010		  RET	16						; Change this value to however much is pushed onto the stack before the procedure is called.
+ 00000297  EB 05		  jmp	_final
 
- 00000291			  _end:
- 00000291  5D			  pop	EBP						; Restore EBP.
- 00000292  C2 0010		  RET	16						; Change this value to however much is pushed onto the stack before the procedure is called.
-
- 00000295			WriteVal	ENDP
+ 00000299			  _end:
+ 00000299  59			  pop	ecx
+ 0000029A  5D			  pop	EBP						; Restore EBP.
+ 0000029B  C2 0014		  RET	20						; Change this value to however much is pushed onto the stack before the procedure is called.
+				  
+ 0000029E			  _final:
+ 0000029E			WriteVal	ENDP
 
 				;----------------------------------------------------------------------------------------------------
 				; Name: FindSum
@@ -603,31 +616,31 @@ Microsoft (R) Macro Assembler Version 14.29.30138.0	    03/11/22 17:29:41
 				; Returns: None
 				;----------------------------------------------------------------------------------------------------
 
- 00000295			FindSum		Proc
- 00000295  55			  PUSH	EBP						; Preserve EBP
- 00000296  8B EC		  mov	EBP, ESP				; Assign static stack-fram pointer.
+ 0000029E			FindSum		Proc
+ 0000029E  55			  PUSH	EBP						; Preserve EBP
+ 0000029F  8B EC		  mov	EBP, ESP				; Assign static stack-fram pointer.
 
- 00000298  BA 00000000		  mov	edx, 0
- 0000029D  8B 7D 08		  mov	edi, [ebp + 8]			; Move the first element of the array.
- 000002A0  8B 4D 0C		  mov	ecx, [ebp + 12]
+ 000002A1  BA 00000000		  mov	edx, 0
+ 000002A6  8B 7D 08		  mov	edi, [ebp + 8]			; Move the first element of the array.
+ 000002A9  8B 4D 0C		  mov	ecx, [ebp + 12]
 				  
- 000002A3			  _addNums:
- 000002A3  8B 07		  mov	eax, [edi]
- 000002A5  03 D0		  add	edx, eax
- 000002A7  83 C7 04		  add	edi, 4
- 000002AA  E2 F7		  loop	_addNums
- 000002AC  B8 00000000		  mov	eax, 0
- 000002B1  8B 45 10		  mov	eax, [ebp + 16]			; Where the sum is stored
- 000002B4  89 10		  mov	[eax], edx
+ 000002AC			  _addNums:
+ 000002AC  8B 07		  mov	eax, [edi]
+ 000002AE  03 D0		  add	edx, eax
+ 000002B0  83 C7 04		  add	edi, 4
+ 000002B3  E2 F7		  loop	_addNums
+ 000002B5  B8 00000000		  mov	eax, 0
+ 000002BA  8B 45 10		  mov	eax, [ebp + 16]			; Where the sum is stored
+ 000002BD  89 10		  mov	[eax], edx
 
 
 
 
 
- 000002B6  5D			  pop	EBP						; Restore EBP.
- 000002B7  C2 0010		  RET	16						; Change this value to however much is pushed onto the stack before the procedure is called.
+ 000002BF  5D			  pop	EBP						; Restore EBP.
+ 000002C0  C2 0010		  RET	16						; Change this value to however much is pushed onto the stack before the procedure is called.
 
- 000002BA			FindSum		ENDP
+ 000002C3			FindSum		ENDP
 
 
 
@@ -647,46 +660,46 @@ Microsoft (R) Macro Assembler Version 14.29.30138.0	    03/11/22 17:29:41
 				; Returns: None
 				;----------------------------------------------------------------------------------------------------
 
- 000002BA			FindAverage		Proc
- 000002BA  55			  PUSH	EBP						; Preserve EBP
- 000002BB  8B EC		  mov	EBP, ESP				; Assign static stack-fram pointer.
+ 000002C3			FindAverage		Proc
+ 000002C3  55			  PUSH	EBP						; Preserve EBP
+ 000002C4  8B EC		  mov	EBP, ESP				; Assign static stack-fram pointer.
 				  
 				  mDisplayString [ebp + 8]
- 000002BD  52		     1		push	EDX
- 000002BE  8B 55 08	     1		mov		EDX, [ebp + 8]
- 000002C1  E8 00000000 E     1		call	WriteString					; Prints whatever string is passed to it.
- 000002C6  5A		     1		pop		EDX
+ 000002C6  52		     1		push	EDX
+ 000002C7  8B 55 08	     1		mov		EDX, [ebp + 8]
+ 000002CA  E8 00000000 E     1		call	WriteString					; Prints whatever string is passed to it.
+ 000002CF  5A		     1		pop		EDX
 
- 000002C7  8B 55 0C		  mov	edx, [ebp + 12]
- 000002CA  8B 02		  mov	eax, [edx]
- 000002CC  BE 0000000A		  mov	esi, 10	
- 000002D1  99			  cdq
- 000002D2  F7 FE		  idiv	esi
- 000002D4  6B D2 02		  imul	edx, 2
- 000002D7  3B D0		  cmp	edx, eax
- 000002D9  7D 02		  jge	_addOne
- 000002DB  EB 0A		  jmp	_dontAdd
+ 000002D0  8B 55 0C		  mov	edx, [ebp + 12]
+ 000002D3  8B 02		  mov	eax, [edx]
+ 000002D5  BE 0000000A		  mov	esi, 10	
+ 000002DA  99			  cdq
+ 000002DB  F7 FE		  idiv	esi
+ 000002DD  6B D2 02		  imul	edx, 2
+ 000002E0  3B D0		  cmp	edx, eax
+ 000002E2  7D 02		  jge	_addOne
+ 000002E4  EB 0A		  jmp	_dontAdd
 
- 000002DD			  _addone:
- 000002DD  83 C0 01		  add	eax, 1
- 000002E0  8B 55 10		  mov	edx, [ebp + 16]			; Where the average is stored
- 000002E3  89 02		  mov	[edx], eax
- 000002E5  EB 05		  jmp	_end
+ 000002E6			  _addone:
+ 000002E6  83 C0 01		  add	eax, 1
+ 000002E9  8B 55 10		  mov	edx, [ebp + 16]			; Where the average is stored
+ 000002EC  89 02		  mov	[edx], eax
+ 000002EE  EB 05		  jmp	_end
 
- 000002E7			  _dontAdd:
- 000002E7  8B 55 10		  mov	edx, [ebp + 16]			; Where the average is stored
- 000002EA  89 02		  mov	[edx], eax
+ 000002F0			  _dontAdd:
+ 000002F0  8B 55 10		  mov	edx, [ebp + 16]			; Where the average is stored
+ 000002F3  89 02		  mov	[edx], eax
 
- 000002EC			  _end:
+ 000002F5			  _end:
 
- 000002EC  5D			  pop	EBP						; Restore EBP.
- 000002ED  C2 0010		  RET	16						; Change this value to however much is pushed onto the stack before the procedure is called.
+ 000002F5  5D			  pop	EBP						; Restore EBP.
+ 000002F6  C2 0010		  RET	16						; Change this value to however much is pushed onto the stack before the procedure is called.
 
- 000002F0			FindAverage		ENDP
+ 000002F9			FindAverage		ENDP
 
 				END main
 
-Microsoft (R) Macro Assembler Version 14.29.30138.0	    03/11/22 17:29:41
+Microsoft (R) Macro Assembler Version 14.29.30138.0	    03/11/22 19:13:46
 "Project 6     (Proj6_pruittad.asm			     Symbols 2 - 1
 
 
@@ -789,7 +802,7 @@ Segments and Groups:
 FLAT . . . . . . . . . . . . . .	GROUP
 STACK  . . . . . . . . . . . . .	32 Bit	 00001000 Para	  Stack	  'STACK'	 
 _DATA  . . . . . . . . . . . . .	32 Bit	 000002E0 Para	  Public  'DATA'	
-_TEXT  . . . . . . . . . . . . .	32 Bit	 000002F0 Para	  Public  'CODE'	
+_TEXT  . . . . . . . . . . . . .	32 Bit	 000002F9 Para	  Public  'CODE'	
 
 
 Procedures, parameters, and locals:
@@ -808,12 +821,12 @@ DumpRegs . . . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External
 ExitProcess  . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
 FileTimeToDosDateTime  . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
 FileTimeToSystemTime . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
-FindAverage  . . . . . . . . . .	P Near	 000002BA _TEXT	Length= 00000036 Public STDCALL
-  _addone  . . . . . . . . . . .	L Near	 000002DD _TEXT	
-  _dontAdd . . . . . . . . . . .	L Near	 000002E7 _TEXT	
-  _end . . . . . . . . . . . . .	L Near	 000002EC _TEXT	
-FindSum  . . . . . . . . . . . .	P Near	 00000295 _TEXT	Length= 00000025 Public STDCALL
-  _addNums . . . . . . . . . . .	L Near	 000002A3 _TEXT	
+FindAverage  . . . . . . . . . .	P Near	 000002C3 _TEXT	Length= 00000036 Public STDCALL
+  _addone  . . . . . . . . . . .	L Near	 000002E6 _TEXT	
+  _dontAdd . . . . . . . . . . .	L Near	 000002F0 _TEXT	
+  _end . . . . . . . . . . . . .	L Near	 000002F5 _TEXT	
+FindSum  . . . . . . . . . . . .	P Near	 0000029E _TEXT	Length= 00000025 Public STDCALL
+  _addNums . . . . . . . . . . .	L Near	 000002AC _TEXT	
 FlushConsoleInputBuffer  . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
 FormatMessageA . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
 GetCommandLineA  . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
@@ -911,21 +924,23 @@ WriteStackFrameName  . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External
 WriteStackFrame  . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
 WriteString  . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
 WriteToFile  . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
-WriteVal . . . . . . . . . . . .	P Near	 0000018B _TEXT	Length= 0000010A Public STDCALL
-  _itsAnArray  . . . . . . . . .	L Near	 000001B0 _TEXT	
-  _letsChangeThis  . . . . . . .	L Near	 000001BA _TEXT	
-  _next  . . . . . . . . . . . .	L Near	 000001C2 _TEXT	
-  _back  . . . . . . . . . . . .	L Near	 000001DB _TEXT	
-  _addFour . . . . . . . . . . .	L Near	 000001FD _TEXT	
-  _negative  . . . . . . . . . .	L Near	 00000205 _TEXT	
-  _print . . . . . . . . . . . .	L Near	 00000212 _TEXT	
-  _letsChangeThisNum . . . . . .	L Near	 0000022A _TEXT	
-  _nextNum . . . . . . . . . . .	L Near	 00000232 _TEXT	
-  _backNum . . . . . . . . . . .	L Near	 0000024B _TEXT	
-  _addFourNum  . . . . . . . . .	L Near	 00000266 _TEXT	
-  _negativeNum . . . . . . . . .	L Near	 0000026E _TEXT	
-  _printNum  . . . . . . . . . .	L Near	 0000027B _TEXT	
-  _end . . . . . . . . . . . . .	L Near	 00000291 _TEXT	
+WriteVal . . . . . . . . . . . .	P Near	 0000018B _TEXT	Length= 00000113 Public STDCALL
+  _itsAnArray  . . . . . . . . .	L Near	 000001AE _TEXT	
+  _letsChangeThis  . . . . . . .	L Near	 000001BB _TEXT	
+  _next  . . . . . . . . . . . .	L Near	 000001C3 _TEXT	
+  _back  . . . . . . . . . . . .	L Near	 000001DC _TEXT	
+  _addFour . . . . . . . . . . .	L Near	 000001FE _TEXT	
+  _negative  . . . . . . . . . .	L Near	 00000206 _TEXT	
+  _print . . . . . . . . . . . .	L Near	 00000213 _TEXT	
+  _letsChangeThisNum . . . . . .	L Near	 0000022B _TEXT	
+  _nextNum . . . . . . . . . . .	L Near	 00000233 _TEXT	
+  _backNum . . . . . . . . . . .	L Near	 0000024C _TEXT	
+  _addFourNum  . . . . . . . . .	L Near	 00000267 _TEXT	
+  _negativeNum . . . . . . . . .	L Near	 0000026F _TEXT	
+  _printNum  . . . . . . . . . .	L Near	 0000027C _TEXT	
+  _endNum  . . . . . . . . . . .	L Near	 00000292 _TEXT	
+  _end . . . . . . . . . . . . .	L Near	 00000299 _TEXT	
+  _final . . . . . . . . . . . .	L Near	 0000029E _TEXT	
 WriteWindowsMsg  . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
 main . . . . . . . . . . . . . .	P Near	 00000000 _TEXT	Length= 000000B8 Public STDCALL
   _getNumLoop  . . . . . . . . .	L Near	 0000000F _TEXT	
