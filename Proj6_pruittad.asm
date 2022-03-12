@@ -59,6 +59,7 @@ ENDM
 					byte	"Please try again: ", 0
   enteredNums		byte	"You entered the following numbers: ", 13, 10, 0
   sumString			byte	"The sum of thse numbers is: ", 0
+  averageString		byte	"The truncated average is: ", 0
   stringLen			sdword	?	
   buffer			byte	21 DUP (0)
   bytesRead			sdword	?
@@ -68,6 +69,7 @@ ENDM
   arrayPosition		sdword	0
   count				sDWORD   LENGTHOF numArray  ; debugging purposes
   numSum			sdword	?
+  numAverage		sdword	?
 
 
   
@@ -112,6 +114,17 @@ _getNumLoop:
   push	offset	asciiArray
   push	offset	numSum
   push	offset	sumString
+  call	WriteVal
+
+  push	offset	numAverage
+  push	offset	numSum
+  push	offset	averageString
+  call	FindAverage
+
+
+  push	offset	asciiArray
+  push	offset	numAverage
+  push	offset	averageString
   call	WriteVal
 
 
@@ -436,7 +449,7 @@ FindSum		Proc
   add	edi, 4
   loop	_addNums
   mov	eax, 0
-  mov	eax, [ebp + 16]
+  mov	eax, [ebp + 16]			; Where the sum is stored
   mov	[eax], edx
 
 
@@ -447,6 +460,57 @@ FindSum		Proc
   RET	16						; Change this value to however much is pushed onto the stack before the procedure is called.
 
 FindSum		ENDP
+
+
+
+;----------------------------------------------------------------------------------------------------
+; Name: FindAverage
+;
+; Displays the introduction 
+;
+; Preconditions: The only preconditions are that the variables need to be pushed onto the stack in
+; the correct order.
+;
+; Postconditions: EDX changed.
+;
+; Receives: 
+;	
+; 
+; Returns: None
+;----------------------------------------------------------------------------------------------------
+
+FindAverage		Proc
+  PUSH	EBP						; Preserve EBP
+  mov	EBP, ESP				; Assign static stack-fram pointer.
+  
+  mDisplayString [ebp + 8]
+
+  mov	edx, [ebp + 12]
+  mov	eax, [edx]
+  mov	esi, 10	
+  cdq
+  idiv	esi
+  imul	edx, 2
+  cmp	edx, eax
+  jge	_addOne
+  jmp	_dontAdd
+
+  _addone:
+  add	eax, 1
+  mov	edx, [ebp + 16]			; Where the average is stored
+  mov	[edx], eax
+  jmp	_end
+
+  _dontAdd:
+  mov	edx, [ebp + 16]			; Where the average is stored
+  mov	[edx], eax
+
+  _end:
+
+  pop	EBP						; Restore EBP.
+  RET	16						; Change this value to however much is pushed onto the stack before the procedure is called.
+
+FindAverage		ENDP
 
 END main
 
