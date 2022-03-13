@@ -1,4 +1,4 @@
-Microsoft (R) Macro Assembler Version 14.29.30138.0	    03/12/22 17:41:28
+Microsoft (R) Macro Assembler Version 14.29.30138.0	    03/12/22 18:29:40
 "Project 6     (Proj6_pruittad.asm			     Page 1 - 1
 
 
@@ -243,8 +243,6 @@ Microsoft (R) Macro Assembler Version 14.29.30138.0	    03/12/22 17:41:28
 				  
  0000005B  E8 00000000 E	  call	crlf
 				  ;Finding the sum and printing it.
-
-
  00000060  68 00000227 R	  push	offset	sumString
  00000065  68 000002B2 R	  push	offset	numSum
  0000006A  68 00000028 R	  push	offset	asciiArray
@@ -515,17 +513,17 @@ Microsoft (R) Macro Assembler Version 14.29.30138.0	    03/12/22 17:41:28
  000001E0			_letsChangeThisNum:
  000001E0  8B 06		  mov	eax, [esi]				; Move the value into eax
  000001E2  B9 00000001		  mov	ecx, 1
- 000001E7				_nextNum:
- 000001E7  83 F8 00			  cmp	eax, 0
- 000001EA  7C 18			  jl	_negativeNum
- 000001EC  BB 0000000A			  mov	ebx, 10
- 000001F1  99				  cdq
- 000001F2  F7 FB			  idiv	ebx
- 000001F4  83 C2 30			  add	edx, 48
- 000001F7  52				  push  edx					; Move the remainder onto the stack
- 000001F8  83 F8 00			  cmp	eax, 0
- 000001FB  7F 02			  jg	_addFourNum			; Continue converting the next number.
- 000001FD  EB 12			  jmp	_printNum
+ 000001E7			_nextNum:
+ 000001E7  83 F8 00		  cmp	eax, 0
+ 000001EA  7C 18		  jl	_negativeNum
+ 000001EC  BB 0000000A		  mov	ebx, 10
+ 000001F1  99			  cdq
+ 000001F2  F7 FB		  idiv	ebx
+ 000001F4  83 C2 30		  add	edx, 48
+ 000001F7  52			  push  edx					; Move the remainder onto the stack
+ 000001F8  83 F8 00		  cmp	eax, 0
+ 000001FB  7F 02		  jg	_addFourNum			; Continue converting the next number.
+ 000001FD  EB 12		  jmp	_printNum
 
  000001FF			_addFourNum:
  000001FF  83 C1 01		  add	ecx, 1
@@ -718,7 +716,7 @@ Microsoft (R) Macro Assembler Version 14.29.30138.0	    03/12/22 17:41:28
 
 				END main
 
-Microsoft (R) Macro Assembler Version 14.29.30138.0	    03/12/22 17:41:28
+Microsoft (R) Macro Assembler Version 14.29.30138.0	    03/12/22 18:29:40
 "Project 6     (Proj6_pruittad.asm			     Symbols 2 - 1
 
 

@@ -10,7 +10,17 @@ TITLE Project 6     (Proj6_pruittad.asm)
 
 INCLUDE Irvine32.inc
 
-; Macros
+;----------------------------------------------------------------------------------------------------
+; Name: mGetString
+;
+; Generates
+;
+; Preconditions: 
+;
+; Receives: 
+; 
+; Returns: None
+;----------------------------------------------------------------------------------------------------
   mGetString macro numPrompt, count, numEntered, byteRead
 	push	edx
 	mov		edx, numPrompt
@@ -23,13 +33,18 @@ INCLUDE Irvine32.inc
 	pop		edx
   
 ENDM
-  ; Needs to display a prompt by reference. 
 
-  ; Check that the user's entry is within the length that can be accepted and that it has only numbers.
-
-  ; Accept the user's number entry and store it in a memory location. Output parameter by reference.
-
-
+;----------------------------------------------------------------------------------------------------
+; Name: mDisplayString
+;
+; Generates
+;
+; Preconditions: 
+;
+; Receives: 
+; 
+; Returns: None
+;----------------------------------------------------------------------------------------------------
   mDisplayString macro string
 	push	EDX
 	mov		EDX, string
@@ -81,9 +96,11 @@ ENDM
 .code
 main PROC
 
+  ; Printing the intro.
   push	offset intro1
   call	Intro
 
+  ; Asking the user for the numbers and storing them.
   mov	ecx, 10
 _getNumLoop:
   push	arrayPosition
@@ -107,8 +124,6 @@ _getNumLoop:
   
   call	crlf
   ;Finding the sum and printing it.
-
-
   push	offset	sumString
   push	offset	numSum
   push	offset	asciiArray
@@ -118,6 +133,7 @@ _getNumLoop:
 
   call	crlf
 
+  ; Find the average and printing it.
   push	offset	numAverage
   push	offset	asciiArray
   push	offset	numSum
@@ -127,6 +143,7 @@ _getNumLoop:
   call	crlf
   call	crlf
 
+  ; Printing out the goodbye.
   push	offset	goodbye
   call	Ending
 
@@ -135,17 +152,17 @@ main ENDP
 
 
 ;----------------------------------------------------------------------------------------------------
-; Name: intro
+; Name: Intro
 ;
 ; Displays the introduction 
 ;
 ; Preconditions: The only preconditions are that the variables need to be pushed onto the stack in
 ; the correct order.
 ;
-; Postconditions: EDX changed.
+; Postconditions: All registers have been restored.
 ;
-; Receives: 
-;	
+; Receives: Some of these are global variables but are first pushed onto the stack. So they are only refereced.
+;	intro1 - [ebp+8] - The string for the intro.
 ; 
 ; Returns: None
 ;----------------------------------------------------------------------------------------------------
@@ -173,7 +190,12 @@ Intro	ENDP
 ; Postconditions: EDX changed.
 ;
 ; Receives: 
-;	
+;  arrayPosition
+;  numArray
+;  wrongNum
+;  bytesRead
+;  inString
+;  enterNum
 ; 
 ; Returns: None
 ;----------------------------------------------------------------------------------------------------
@@ -351,17 +373,17 @@ WriteVal	Proc
 _letsChangeThisNum:
   mov	eax, [esi]				; Move the value into eax
   mov	ecx, 1
-	_nextNum:
-	  cmp	eax, 0
-	  jl	_negativeNum
-	  mov	ebx, 10
-	  cdq
-	  idiv	ebx
-	  add	edx, 48
-	  push  edx					; Move the remainder onto the stack
-	  cmp	eax, 0
-	  jg	_addFourNum			; Continue converting the next number.
-	  jmp	_printNum
+_nextNum:
+  cmp	eax, 0
+  jl	_negativeNum
+  mov	ebx, 10
+  cdq
+  idiv	ebx
+  add	edx, 48
+  push  edx					; Move the remainder onto the stack
+  cmp	eax, 0
+  jg	_addFourNum			; Continue converting the next number.
+  jmp	_printNum
 
 _addFourNum:
   add	ecx, 1
@@ -389,7 +411,7 @@ _printNum:
 
   popad
   pop	EBP						; Restore EBP.
-  RET							; Change this value to however much is pushed onto the stack before the procedure is called.
+  RET							; Every time I try and add a number here it messes up the rest of the program.
   
 WriteVal	ENDP
 
