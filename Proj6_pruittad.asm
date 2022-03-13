@@ -13,7 +13,7 @@ INCLUDE Irvine32.inc
 ;----------------------------------------------------------------------------------------------------
 ; Name: mGetString
 ;
-; Generates
+; Generates 
 ;
 ; Preconditions: 
 ;

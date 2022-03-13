@@ -1,4 +1,4 @@
-Microsoft (R) Macro Assembler Version 14.29.30138.0	    03/12/22 18:29:40
+Microsoft (R) Macro Assembler Version 14.29.30138.0	    03/12/22 19:23:46
 "Project 6     (Proj6_pruittad.asm			     Page 1 - 1
 
 
@@ -31,7 +31,17 @@ Microsoft (R) Macro Assembler Version 14.29.30138.0	    03/12/22 18:29:40
 			      C .LIST
 			      C 
 
-				; Macros
+				;----------------------------------------------------------------------------------------------------
+				; Name: mGetString
+				;
+				; Generates
+				;
+				; Preconditions: 
+				;
+				; Receives: 
+				; 
+				; Returns: None
+				;----------------------------------------------------------------------------------------------------
 				  mGetString macro numPrompt, count, numEntered, byteRead
 					push	edx
 					mov		edx, numPrompt
@@ -44,13 +54,18 @@ Microsoft (R) Macro Assembler Version 14.29.30138.0	    03/12/22 18:29:40
 					pop		edx
 				  
 				ENDM
-				  ; Needs to display a prompt by reference. 
 
-				  ; Check that the user's entry is within the length that can be accepted and that it has only numbers.
-
-				  ; Accept the user's number entry and store it in a memory location. Output parameter by reference.
-
-
+				;----------------------------------------------------------------------------------------------------
+				; Name: mDisplayString
+				;
+				; Generates
+				;
+				; Preconditions: 
+				;
+				; Receives: 
+				; 
+				; Returns: None
+				;----------------------------------------------------------------------------------------------------
 				  mDisplayString macro string
 					push	EDX
 					mov		EDX, string
@@ -216,9 +231,11 @@ Microsoft (R) Macro Assembler Version 14.29.30138.0	    03/12/22 18:29:40
  00000000			.code
  00000000			main PROC
 
+				  ; Printing the intro.
  00000000  68 0000003C R	  push	offset intro1
  00000005  E8 000000AE		  call	Intro
 
+				  ; Asking the user for the numbers and storing them.
  0000000A  B9 0000000A		  mov	ecx, 10
  0000000F			_getNumLoop:
  0000000F  FF 35 000002AA R	  push	arrayPosition
@@ -252,6 +269,7 @@ Microsoft (R) Macro Assembler Version 14.29.30138.0	    03/12/22 18:29:40
 
  0000007F  E8 00000000 E	  call	crlf
 
+				  ; Find the average and printing it.
  00000084  68 000002B6 R	  push	offset	numAverage
  00000089  68 00000028 R	  push	offset	asciiArray
  0000008E  68 000002B2 R	  push	offset	numSum
@@ -261,6 +279,7 @@ Microsoft (R) Macro Assembler Version 14.29.30138.0	    03/12/22 18:29:40
  0000009D  E8 00000000 E	  call	crlf
  000000A2  E8 00000000 E	  call	crlf
 
+				  ; Printing out the goodbye.
  000000A7  68 0000025F R	  push	offset	goodbye
  000000AC  E8 00000206		  call	Ending
 
@@ -271,17 +290,17 @@ Microsoft (R) Macro Assembler Version 14.29.30138.0	    03/12/22 18:29:40
 
 
 				;----------------------------------------------------------------------------------------------------
-				; Name: intro
+				; Name: Intro
 				;
 				; Displays the introduction 
 				;
 				; Preconditions: The only preconditions are that the variables need to be pushed onto the stack in
 				; the correct order.
 				;
-				; Postconditions: EDX changed.
+				; Postconditions: All registers have been restored.
 				;
-				; Receives: 
-				;	
+				; Receives: Some of these are global variables but are first pushed onto the stack. So they are only refereced.
+				;	intro1 - [ebp+8] - The string for the intro.
 				; 
 				; Returns: None
 				;----------------------------------------------------------------------------------------------------
@@ -313,7 +332,12 @@ Microsoft (R) Macro Assembler Version 14.29.30138.0	    03/12/22 18:29:40
 				; Postconditions: EDX changed.
 				;
 				; Receives: 
-				;	
+				;  arrayPosition
+				;  numArray
+				;  wrongNum
+				;  bytesRead
+				;  inString
+				;  enterNum
 				; 
 				; Returns: None
 				;----------------------------------------------------------------------------------------------------
@@ -555,7 +579,7 @@ Microsoft (R) Macro Assembler Version 14.29.30138.0	    03/12/22 18:29:40
 
  0000022F  61			  popad
  00000230  5D			  pop	EBP						; Restore EBP.
- 00000231  C3			  RET							; Change this value to however much is pushed onto the stack before the procedure is called.
+ 00000231  C3			  RET							; Every time I try and add a number here it messes up the rest of the program.
 				  
  00000232			WriteVal	ENDP
 
@@ -716,7 +740,7 @@ Microsoft (R) Macro Assembler Version 14.29.30138.0	    03/12/22 18:29:40
 
 				END main
 
-Microsoft (R) Macro Assembler Version 14.29.30138.0	    03/12/22 18:29:40
+Microsoft (R) Macro Assembler Version 14.29.30138.0	    03/12/22 19:23:46
 "Project 6     (Proj6_pruittad.asm			     Symbols 2 - 1
 
 
