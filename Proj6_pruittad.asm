@@ -118,6 +118,7 @@ _getNumLoop:
   call	crlf
 
   push	offset	numAverage
+  push	offset	asciiArray
   push	offset	numSum
   push	offset	averageString
   call	FindAverage
@@ -480,15 +481,22 @@ FindAverage		Proc
 
   _addone:
   add	eax, 1
-  mov	edx, [ebp + 16]			; Where the average is stored
+  mov	edx, [ebp + 20]			; Where the average is stored
   mov	[edx], eax
   jmp	_print
 
   _dontAdd:
-  mov	edx, [ebp + 16]			; Where the average is stored
+  mov	edx, [ebp + 20]			; Where the average is stored
   mov	[edx], eax
 
   _print:
+  mov	edi, [ebp + 16]
+  mov	esi, [ebp + 20]
+  push	ecx
+  push	edi
+  call	writeVal
+  pop	edi
+  pop	ecx
 
   popad
   pop	EBP						; Restore EBP.
