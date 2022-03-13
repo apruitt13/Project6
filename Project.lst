@@ -1,4 +1,4 @@
-Microsoft (R) Macro Assembler Version 14.29.30138.0	    03/12/22 13:13:33
+Microsoft (R) Macro Assembler Version 14.29.30138.0	    03/12/22 16:12:02
 "Project 6     (Proj6_pruittad.asm			     Page 1 - 1
 
 
@@ -242,13 +242,13 @@ Microsoft (R) Macro Assembler Version 14.29.30138.0	    03/12/22 13:13:33
  00000060  68 0000029C R	  push	offset numSum
  00000065  FF 35 00000298 R	  push	count
  0000006B  68 00000000 R	  push	offset	numArray
- 00000070  E8 00000183		  call  FindSum
+ 00000070  E8 00000190		  call  FindSum
 
 
  00000075  68 000002A0 R	  push	offset	numAverage
  0000007A  68 0000029C R	  push	offset	numSum
  0000007F  68 00000244 R	  push	offset	averageString
- 00000084  E8 00000196		  call	FindAverage
+ 00000084  E8 000001A3		  call	FindAverage
 
 
 					Invoke ExitProcess,0	; exit to operating system
@@ -461,20 +461,24 @@ Microsoft (R) Macro Assembler Version 14.29.30138.0	    03/12/22 13:13:33
  00000188			  _printVal:
  00000188  51			  push	ecx
  00000189  57			  push	edi
-				  ;push	esi
-				  ; make sure to push and add.
- 0000018A  E8 0000000A		  call	writeVal
-				  ;pop	esi
-				  ;pop	edi
- 0000018F  83 C6 04		  add	esi, 4
-				  ;pop	ecx
- 00000192  E2 F4		  loop	_printVal
+ 0000018A  E8 0000001F		  call	writeVal
+ 0000018F  5F			  pop	edi
+ 00000190  59			  pop	ecx
+ 00000191  83 C6 04		  add	esi, 4
+ 00000194  83 F9 01		  cmp	ecx, 1
+ 00000197  74 10		  je	_end
+ 00000199  B0 2C		  mov	al, ','
+ 0000019B  E8 00000000 E	  call	WriteChar
+ 000001A0  B0 20		  mov	al, ' '
+ 000001A2  E8 00000000 E	  call	WriteChar
+ 000001A7  E2 DF		  loop	_printVal
 				  
- 00000194  61			  popad
- 00000195  5D			  pop	EBP						; Restore EBP.
- 00000196  C2 0014		  RET	20						; Change this value to however much is pushed onto the stack before the procedure is called.
+ 000001A9			  _end:
+ 000001A9  61			  popad
+ 000001AA  5D			  pop	EBP						; Restore EBP.
+ 000001AB  C2 0014		  RET	20						; Change this value to however much is pushed onto the stack before the procedure is called.
 				  
- 00000199			PrintArray	ENDP
+ 000001AE			PrintArray	ENDP
 
 				;----------------------------------------------------------------------------------------------------
 				; Name: writeVal
@@ -491,71 +495,66 @@ Microsoft (R) Macro Assembler Version 14.29.30138.0	    03/12/22 13:13:33
 				; 
 				; Returns: None
 				;----------------------------------------------------------------------------------------------------
- 00000199			WriteVal	Proc
- 00000199  55			  PUSH	EBP						; Preserve EBP
- 0000019A  8B EC		  mov	EBP, ESP				; Assign static stack-fram pointer.
- 0000019C  60			  pushad
- 0000019D  FC			  CLD
+ 000001AE			WriteVal	Proc
+ 000001AE  55			  PUSH	EBP						; Preserve EBP
+ 000001AF  8B EC		  mov	EBP, ESP				; Assign static stack-fram pointer.
+ 000001B1  60			  pushad
+ 000001B2  FC			  CLD
 
- 0000019E			_letsChangeThisNum:
- 0000019E  8B 06		  mov	eax, [esi]				; Move the value into eax
- 000001A0  B9 00000001		  mov	ecx, 1
-
-
- 000001A5				_nextNum:
- 000001A5  83 F8 00			  cmp	eax, 0
- 000001A8  7C 18			  jl	_negativeNum
- 000001AA  BB 0000000A			  mov	ebx, 10
- 000001AF  99				  cdq
- 000001B0  F7 FB			  idiv	ebx
- 000001B2  83 C2 30			  add	edx, 48
- 000001B5  52				  push  edx					; Move the remainder onto the stack
- 000001B6  83 F8 00			  cmp	eax, 0
- 000001B9  7F 02			  jg	_addFourNum			; Continue converting the next number.
-					  ;mov	edi, [ebp + 8]
- 000001BB  EB 12			  jmp	_printNum
-
- 000001BD			_addFourNum:
- 000001BD  83 C1 01		  add	ecx, 1
- 000001C0  EB E3		  jmp	_nextNum
+ 000001B3			_letsChangeThisNum:
+ 000001B3  8B 06		  mov	eax, [esi]				; Move the value into eax
+ 000001B5  B9 00000001		  mov	ecx, 1
 
 
- 000001C2			_negativeNum:
- 000001C2  F7 D8		  neg	eax
- 000001C4  50			  push	eax
- 000001C5  B0 2D		  mov	al, '-'
- 000001C7  E8 00000000 E	  call	writeChar
- 000001CC  58			  pop	eax
- 000001CD  EB D6		  jmp	_nextNum  
+ 000001BA				_nextNum:
+ 000001BA  83 F8 00			  cmp	eax, 0
+ 000001BD  7C 18			  jl	_negativeNum
+ 000001BF  BB 0000000A			  mov	ebx, 10
+ 000001C4  99				  cdq
+ 000001C5  F7 FB			  idiv	ebx
+ 000001C7  83 C2 30			  add	edx, 48
+ 000001CA  52				  push  edx					; Move the remainder onto the stack
+ 000001CB  83 F8 00			  cmp	eax, 0
+ 000001CE  7F 02			  jg	_addFourNum			; Continue converting the next number.
+ 000001D0  EB 12			  jmp	_printNum
 
- 000001CF			_printNum:
- 000001CF  58			  pop	eax
- 000001D0  AA			  stosb
- 000001D1  8B D0		  mov	edx, eax
- 000001D3  8B 55 08		  mov	edx, [ebp + 8]
-				  pop
-Proj6_pruittad.asm(376) : error A2008:syntax error : in instruction
- 000001D6  E2 F7		  loop	_printNum
+ 000001D2			_addFourNum:
+ 000001D2  83 C1 01		  add	ecx, 1
+ 000001D5  EB E3		  jmp	_nextNum
+
+
+ 000001D7			_negativeNum:
+ 000001D7  F7 D8		  neg	eax
+ 000001D9  50			  push	eax
+ 000001DA  B0 2D		  mov	al, '-'
+ 000001DC  E8 00000000 E	  call	writeChar
+ 000001E1  58			  pop	eax
+ 000001E2  EB D6		  jmp	_nextNum  
+
+ 000001E4			_printNum:
+ 000001E4  58			  pop	eax
+ 000001E5  AA			  stosb
+ 000001E6  8B D0		  mov	edx, eax
+ 000001E8  8B 55 08		  mov	edx, [ebp + 8]
+ 000001EB  E2 F7		  loop	_printNum
+ 000001ED  B8 00000000		  mov	eax, 0
+ 000001F2  AA			  stosb
 				  mDisplayString edx
- 000001D8  52		     1		push	EDX
- 000001D9  8B D2	     1		mov		EDX, edx
- 000001DB  E8 00000000 E     1		call	WriteString					; Prints whatever string is passed to it.
- 000001E0  5A		     1		pop		EDX
- 000001E1  B0 2C		  mov	al, ','
- 000001E3  E8 00000000 E	  call	WriteChar
- 000001E8  B0 20		  mov	al, ' '
- 000001EA  E8 00000000 E	  call	WriteChar
- 000001EF  B8 00000000		  mov	eax, 0
- 000001F4  AA			  stosb
+ 000001F3  52		     1		push	EDX
+ 000001F4  8B D2	     1		mov		EDX, edx
+ 000001F6  E8 00000000 E     1		call	WriteString					; Prints whatever string is passed to it.
+ 000001FB  5A		     1		pop		EDX
+ 000001FC  B8 00000000		  mov	eax, 0
+ 00000201  AA			  stosb
 
 
- 000001F5			  _end:
+ 00000202			  _end:
 
- 000001F5  61			  popad
- 000001F6  5D			  pop	EBP						; Restore EBP.
- 000001F7  C3			  RET							; Change this value to however much is pushed onto the stack before the procedure is called.
+ 00000202  61			  popad
+ 00000203  5D			  pop	EBP						; Restore EBP.
+ 00000204  C3			  RET							; Change this value to however much is pushed onto the stack before the procedure is called.
 				  
- 000001F8			WriteVal	ENDP
+ 00000205			WriteVal	ENDP
 
 				;----------------------------------------------------------------------------------------------------
 				; Name: FindSum
@@ -573,32 +572,32 @@ Proj6_pruittad.asm(376) : error A2008:syntax error : in instruction
 				; Returns: None
 				;----------------------------------------------------------------------------------------------------
 
- 000001F8			FindSum		Proc
- 000001F8  55			  PUSH	EBP						; Preserve EBP
- 000001F9  8B EC		  mov	EBP, ESP				; Assign static stack-fram pointer.
- 000001FB  60			  pushad
+ 00000205			FindSum		Proc
+ 00000205  55			  PUSH	EBP						; Preserve EBP
+ 00000206  8B EC		  mov	EBP, ESP				; Assign static stack-fram pointer.
+ 00000208  60			  pushad
 
- 000001FC  BA 00000000		  mov	edx, 0
- 00000201  8B 7D 08		  mov	edi, [ebp + 8]			; Move the first element of the array.
- 00000204  8B 4D 0C		  mov	ecx, [ebp + 12]
+ 00000209  BA 00000000		  mov	edx, 0
+ 0000020E  8B 7D 08		  mov	edi, [ebp + 8]			; Move the first element of the array.
+ 00000211  8B 4D 0C		  mov	ecx, [ebp + 12]
 				  
- 00000207			  _addNums:
- 00000207  8B 07		  mov	eax, [edi]
- 00000209  03 D0		  add	edx, eax
- 0000020B  83 C7 04		  add	edi, 4
- 0000020E  E2 F7		  loop	_addNums
- 00000210  B8 00000000		  mov	eax, 0
- 00000215  8B 45 10		  mov	eax, [ebp + 16]			; Where the sum is stored
- 00000218  89 10		  mov	[eax], edx
+ 00000214			  _addNums:
+ 00000214  8B 07		  mov	eax, [edi]
+ 00000216  03 D0		  add	edx, eax
+ 00000218  83 C7 04		  add	edi, 4
+ 0000021B  E2 F7		  loop	_addNums
+ 0000021D  B8 00000000		  mov	eax, 0
+ 00000222  8B 45 10		  mov	eax, [ebp + 16]			; Where the sum is stored
+ 00000225  89 10		  mov	[eax], edx
 
 
 
 
- 0000021A  61			  popad
- 0000021B  5D			  pop	EBP						; Restore EBP.
- 0000021C  C2 0010		  RET	16						; Change this value to however much is pushed onto the stack before the procedure is called.
+ 00000227  61			  popad
+ 00000228  5D			  pop	EBP						; Restore EBP.
+ 00000229  C2 0010		  RET	16						; Change this value to however much is pushed onto the stack before the procedure is called.
 
- 0000021F			FindSum		ENDP
+ 0000022C			FindSum		ENDP
 
 
 
@@ -618,48 +617,48 @@ Proj6_pruittad.asm(376) : error A2008:syntax error : in instruction
 				; Returns: None
 				;----------------------------------------------------------------------------------------------------
 
- 0000021F			FindAverage		Proc
- 0000021F  55			  PUSH	EBP						; Preserve EBP
- 00000220  8B EC		  mov	EBP, ESP				; Assign static stack-fram pointer.
- 00000222  60			  pushad
+ 0000022C			FindAverage		Proc
+ 0000022C  55			  PUSH	EBP						; Preserve EBP
+ 0000022D  8B EC		  mov	EBP, ESP				; Assign static stack-fram pointer.
+ 0000022F  60			  pushad
 
 				  mDisplayString [ebp + 8]
- 00000223  52		     1		push	EDX
- 00000224  8B 55 08	     1		mov		EDX, [ebp + 8]
- 00000227  E8 00000000 E     1		call	WriteString					; Prints whatever string is passed to it.
- 0000022C  5A		     1		pop		EDX
+ 00000230  52		     1		push	EDX
+ 00000231  8B 55 08	     1		mov		EDX, [ebp + 8]
+ 00000234  E8 00000000 E     1		call	WriteString					; Prints whatever string is passed to it.
+ 00000239  5A		     1		pop		EDX
 
- 0000022D  8B 55 0C		  mov	edx, [ebp + 12]
- 00000230  8B 02		  mov	eax, [edx]
- 00000232  BE 0000000A		  mov	esi, 10	
- 00000237  99			  cdq
- 00000238  F7 FE		  idiv	esi
- 0000023A  6B D2 02		  imul	edx, 2
- 0000023D  3B D0		  cmp	edx, eax
- 0000023F  7D 02		  jge	_addOne
- 00000241  EB 0A		  jmp	_dontAdd
+ 0000023A  8B 55 0C		  mov	edx, [ebp + 12]
+ 0000023D  8B 02		  mov	eax, [edx]
+ 0000023F  BE 0000000A		  mov	esi, 10	
+ 00000244  99			  cdq
+ 00000245  F7 FE		  idiv	esi
+ 00000247  6B D2 02		  imul	edx, 2
+ 0000024A  3B D0		  cmp	edx, eax
+ 0000024C  7D 02		  jge	_addOne
+ 0000024E  EB 0A		  jmp	_dontAdd
 
- 00000243			  _addone:
- 00000243  83 C0 01		  add	eax, 1
- 00000246  8B 55 10		  mov	edx, [ebp + 16]			; Where the average is stored
- 00000249  89 02		  mov	[edx], eax
- 0000024B  EB 05		  jmp	_end
+ 00000250			  _addone:
+ 00000250  83 C0 01		  add	eax, 1
+ 00000253  8B 55 10		  mov	edx, [ebp + 16]			; Where the average is stored
+ 00000256  89 02		  mov	[edx], eax
+ 00000258  EB 05		  jmp	_end
 
- 0000024D			  _dontAdd:
- 0000024D  8B 55 10		  mov	edx, [ebp + 16]			; Where the average is stored
- 00000250  89 02		  mov	[edx], eax
+ 0000025A			  _dontAdd:
+ 0000025A  8B 55 10		  mov	edx, [ebp + 16]			; Where the average is stored
+ 0000025D  89 02		  mov	[edx], eax
 
- 00000252			  _end:
+ 0000025F			  _end:
 
- 00000252  61			  popad
- 00000253  5D			  pop	EBP						; Restore EBP.
- 00000254  C2 0010		  RET	16						; Change this value to however much is pushed onto the stack before the procedure is called.
+ 0000025F  61			  popad
+ 00000260  5D			  pop	EBP						; Restore EBP.
+ 00000261  C2 0010		  RET	16						; Change this value to however much is pushed onto the stack before the procedure is called.
 
- 00000257			FindAverage		ENDP
+ 00000264			FindAverage		ENDP
 
 				END main
 
-Microsoft (R) Macro Assembler Version 14.29.30138.0	    03/12/22 13:13:33
+Microsoft (R) Macro Assembler Version 14.29.30138.0	    03/12/22 16:12:02
 "Project 6     (Proj6_pruittad.asm			     Symbols 2 - 1
 
 
@@ -762,7 +761,7 @@ Segments and Groups:
 FLAT . . . . . . . . . . . . . .	GROUP
 STACK  . . . . . . . . . . . . .	32 Bit	 00001000 Para	  Stack	  'STACK'	 
 _DATA  . . . . . . . . . . . . .	32 Bit	 000002A8 Para	  Public  'DATA'	
-_TEXT  . . . . . . . . . . . . .	32 Bit	 00000257 Para	  Public  'CODE'	
+_TEXT  . . . . . . . . . . . . .	32 Bit	 00000264 Para	  Public  'CODE'	
 
 
 Procedures, parameters, and locals:
@@ -781,12 +780,12 @@ DumpRegs . . . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External
 ExitProcess  . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
 FileTimeToDosDateTime  . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
 FileTimeToSystemTime . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
-FindAverage  . . . . . . . . . .	P Near	 0000021F _TEXT	Length= 00000038 Public STDCALL
-  _addone  . . . . . . . . . . .	L Near	 00000243 _TEXT	
-  _dontAdd . . . . . . . . . . .	L Near	 0000024D _TEXT	
-  _end . . . . . . . . . . . . .	L Near	 00000252 _TEXT	
-FindSum  . . . . . . . . . . . .	P Near	 000001F8 _TEXT	Length= 00000027 Public STDCALL
-  _addNums . . . . . . . . . . .	L Near	 00000207 _TEXT	
+FindAverage  . . . . . . . . . .	P Near	 0000022C _TEXT	Length= 00000038 Public STDCALL
+  _addone  . . . . . . . . . . .	L Near	 00000250 _TEXT	
+  _dontAdd . . . . . . . . . . .	L Near	 0000025A _TEXT	
+  _end . . . . . . . . . . . . .	L Near	 0000025F _TEXT	
+FindSum  . . . . . . . . . . . .	P Near	 00000205 _TEXT	Length= 00000027 Public STDCALL
+  _addNums . . . . . . . . . . .	L Near	 00000214 _TEXT	
 FlushConsoleInputBuffer  . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
 FormatMessageA . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
 GetCommandLineA  . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
@@ -824,8 +823,9 @@ OpenInputFile  . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External
 ParseDecimal32 . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
 ParseInteger32 . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
 PeekConsoleInputA  . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
-PrintArray . . . . . . . . . . .	P Near	 0000016A _TEXT	Length= 0000002F Public STDCALL
+PrintArray . . . . . . . . . . .	P Near	 0000016A _TEXT	Length= 00000044 Public STDCALL
   _printVal  . . . . . . . . . .	L Near	 00000188 _TEXT	
+  _end . . . . . . . . . . . . .	L Near	 000001A9 _TEXT	
 Random32 . . . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
 RandomRange  . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
 Randomize  . . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
@@ -886,13 +886,13 @@ WriteStackFrameName  . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External
 WriteStackFrame  . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
 WriteString  . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
 WriteToFile  . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
-WriteVal . . . . . . . . . . . .	P Near	 00000199 _TEXT	Length= 0000005F Public STDCALL
-  _letsChangeThisNum . . . . . .	L Near	 0000019E _TEXT	
-  _nextNum . . . . . . . . . . .	L Near	 000001A5 _TEXT	
-  _addFourNum  . . . . . . . . .	L Near	 000001BD _TEXT	
-  _negativeNum . . . . . . . . .	L Near	 000001C2 _TEXT	
-  _printNum  . . . . . . . . . .	L Near	 000001CF _TEXT	
-  _end . . . . . . . . . . . . .	L Near	 000001F5 _TEXT	
+WriteVal . . . . . . . . . . . .	P Near	 000001AE _TEXT	Length= 00000057 Public STDCALL
+  _letsChangeThisNum . . . . . .	L Near	 000001B3 _TEXT	
+  _nextNum . . . . . . . . . . .	L Near	 000001BA _TEXT	
+  _addFourNum  . . . . . . . . .	L Near	 000001D2 _TEXT	
+  _negativeNum . . . . . . . . .	L Near	 000001D7 _TEXT	
+  _printNum  . . . . . . . . . .	L Near	 000001E4 _TEXT	
+  _end . . . . . . . . . . . . .	L Near	 00000202 _TEXT	
 WriteWindowsMsg  . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
 main . . . . . . . . . . . . . .	P Near	 00000000 _TEXT	Length= 00000090 Public STDCALL
   _getNumLoop  . . . . . . . . .	L Near	 0000000F _TEXT	
@@ -1155,4 +1155,4 @@ wsprintf . . . . . . . . . . . .	Text   	 wsprintfA
 yellow . . . . . . . . . . . . .	Number	 0000000Eh   
 
 	   0 Warnings
-	   1 Errors
+	   0 Errors

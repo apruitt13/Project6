@@ -301,15 +301,19 @@ PrintArray	Proc
   _printVal:
   push	ecx
   push	edi
-  ;push	esi
-  ; make sure to push and add.
   call	writeVal
-  ;pop	esi
-  ;pop	edi
+  pop	edi
+  pop	ecx
   add	esi, 4
-  ;pop	ecx
+  cmp	ecx, 1
+  je	_end
+  mov	al, ','
+  call	WriteChar
+  mov	al, ' '
+  call	WriteChar
   loop	_printVal
   
+  _end:
   popad
   pop	EBP						; Restore EBP.
   RET	20						; Change this value to however much is pushed onto the stack before the procedure is called.
@@ -352,7 +356,6 @@ _letsChangeThisNum:
 	  push  edx					; Move the remainder onto the stack
 	  cmp	eax, 0
 	  jg	_addFourNum			; Continue converting the next number.
-	  ;mov	edi, [ebp + 8]
 	  jmp	_printNum
 
 _addFourNum:
@@ -374,11 +377,9 @@ _printNum:
   mov	edx, eax
   mov	edx, [ebp + 8]
   loop	_printNum
+  mov	eax, 0
+  stosb
   mDisplayString edx
-  mov	al, ','
-  call	WriteChar
-  mov	al, ' '
-  call	WriteChar
   mov	eax, 0
   stosb
 
