@@ -97,21 +97,25 @@ _getNumLoop:
 
   call	crlf
 
-
+  ;printing out the array.
   push	count
   push	offset	asciiArray
   push	offset	numArray
   push	offset	enteredNums
   call	PrintArray
   
-
-  ;Finding the sum
   call	crlf
-  push	offset numSum
+  ;Finding the sum and printing it.
+
+
+  push	offset	sumString
+  push	offset	numSum
+  push	offset	asciiArray
   push	count
   push	offset	numArray
   call  FindSum
 
+  call	crlf
 
   push	offset	numAverage
   push	offset	numSum
@@ -344,8 +348,6 @@ WriteVal	Proc
 _letsChangeThisNum:
   mov	eax, [esi]				; Move the value into eax
   mov	ecx, 1
-
-
 	_nextNum:
 	  cmp	eax, 0
 	  jl	_negativeNum
@@ -361,7 +363,6 @@ _letsChangeThisNum:
 _addFourNum:
   add	ecx, 1
   jmp	_nextNum
-
 
 _negativeNum:
   neg	eax
@@ -382,9 +383,6 @@ _printNum:
   mDisplayString edx
   mov	eax, 0
   stosb
-
-
-  _end:
 
   popad
   pop	EBP						; Restore EBP.
@@ -413,9 +411,11 @@ FindSum		Proc
   mov	EBP, ESP				; Assign static stack-fram pointer.
   pushad
 
+  mDisplayString [ebp + 24]		; Displays the string enteredNums
+
   mov	edx, 0
   mov	edi, [ebp + 8]			; Move the first element of the array.
-  mov	ecx, [ebp + 12]
+  mov	ecx, [ebp + 12]			; The count
   
   _addNums:
   mov	eax, [edi]
@@ -423,10 +423,18 @@ FindSum		Proc
   add	edi, 4
   loop	_addNums
   mov	eax, 0
-  mov	eax, [ebp + 16]			; Where the sum is stored
-  mov	[eax], edx
+  mov	eax, [ebp + 20]			; Where the sum is stored
+  mov	[eax], edx				; the total was stored in edx now moving to sdword.	
 
+  ; display the sum.
 
+  mov	edi, [ebp + 16]
+  mov	esi, [ebp + 20]
+  push	ecx
+  push	edi
+  call	writeVal
+  pop	edi
+  pop	ecx
 
 
   popad
@@ -474,13 +482,13 @@ FindAverage		Proc
   add	eax, 1
   mov	edx, [ebp + 16]			; Where the average is stored
   mov	[edx], eax
-  jmp	_end
+  jmp	_print
 
   _dontAdd:
   mov	edx, [ebp + 16]			; Where the average is stored
   mov	[edx], eax
 
-  _end:
+  _print:
 
   popad
   pop	EBP						; Restore EBP.
