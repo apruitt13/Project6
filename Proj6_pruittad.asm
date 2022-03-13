@@ -60,6 +60,7 @@ ENDM
   enteredNums		byte	"You entered the following numbers: ", 13, 10, 0
   sumString			byte	"The sum of thse numbers is: ", 0
   averageString		byte	"The truncated average is: ", 0
+  goodbye			byte	"Thanks for playing!", 13,10,0
   stringLen			sdword	?	
   buffer			byte	21 DUP (0)
   bytesRead			sdword	?
@@ -123,6 +124,11 @@ _getNumLoop:
   push	offset	averageString
   call	FindAverage
 
+  call	crlf
+  call	crlf
+
+  push	offset	goodbye
+  call	Ending
 
 	Invoke ExitProcess,0	; exit to operating system
 main ENDP
@@ -174,7 +180,8 @@ Intro	ENDP
 ReadVal	Proc
   PUSH	EBP						; Preserve EBP
   mov	EBP, ESP				; Assign static stack-fram pointer.
-  push  ecx						; Saving the loop count.
+  pushad					; Saving the loop count.
+						
   
   mov	edi, 0				; This is going to be my integer
   mov	edx, 0				; Make sure this is cleared or it will make some of the integers negative.
@@ -221,6 +228,7 @@ _positive:
 
 ; The number is not valid. A new string is displayed and a new number retrieved.
 _invalid:
+  mov	edi, 0
   mGetString [ebp+20], CHARACTERSIZE, [ebp+12], [ebp+16]		; If it's an invalid number it prints a different statement and counts the string again.
   mov	eax, [ebp+16]
   mov	esi, [ebp+12]
@@ -260,15 +268,9 @@ _addToArray:
   mov	eax, [ebp + 24]
   add	eax, edx
   mov	[eax], edi
-  ;mov	edi, [eax]		; Debugging purposes printed out the number.
-  ;mov	eax, edi
-  ;call	writeint
 
+  popad
 
-
-
-; add the number to the array.
-  pop   ecx
   pop	EBP						; Restore EBP.
   RET	28						; Change this value to however much is pushed onto the stack before the procedure is called.
 
@@ -440,7 +442,7 @@ FindSum		Proc
 
   popad
   pop	EBP						; Restore EBP.
-  RET	16						; Change this value to however much is pushed onto the stack before the procedure is called.
+  RET	20						; Change this value to however much is pushed onto the stack before the procedure is called.
 
 FindSum		ENDP
 
@@ -476,7 +478,7 @@ FindAverage		Proc
   idiv	esi
   imul	edx, 2
   cmp	edx, eax
-  jge	_addOne
+  ;jge	_addOne
   jmp	_dontAdd
 
   _addone:
@@ -503,6 +505,36 @@ FindAverage		Proc
   RET	16						; Change this value to however much is pushed onto the stack before the procedure is called.
 
 FindAverage		ENDP
+
+;----------------------------------------------------------------------------------------------------
+; Name: FindAverage
+;
+; Displays the introduction 
+;
+; Preconditions: The only preconditions are that the variables need to be pushed onto the stack in
+; the correct order.
+;
+; Postconditions: EDX changed.
+;
+; Receives: 
+;	
+; 
+; Returns: None
+;----------------------------------------------------------------------------------------------------
+
+Ending		PROC
+
+  PUSH	EBP						; Preserve EBP
+  mov	EBP, ESP				; Assign static stack-fram pointer.
+  pushad
+
+  mDisplayString [ebp+8]			; Prints ending.
+
+  popad
+  pop	EBP						; Restore EBP.
+  RET	4
+
+Ending		ENDP
 
 END main
 
