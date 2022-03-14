@@ -436,15 +436,19 @@ PrintArray	ENDP
 ;----------------------------------------------------------------------------------------------------
 ; Name: FindSum
 ;
-; Displays the introduction 
+; Finds the sum of all the entered numbers. It will then print the sum by converting the integer into a string using WriteVal.
 ;
 ; Preconditions: The only preconditions are that the variables need to be pushed onto the stack in
 ; the correct order.
 ;
-; Postconditions: EDX changed.
+; Postconditions: All registers are restored.
 ;
 ; Receives: 
-;	
+;	sumString	= [ebp + 24] - String to be printed saying this is the sum.
+;	numSum		= [ebp + 20] - Where the sum is stored.
+;	asciiArray	= [ebp + 16] - The array where the string equivalent of an integer is stored when converted.		
+;	count		= [ebp + 12] - Length of the array for loop.
+;	numArray	= [ebp + 8]	 - The array where the integers are stored.
 ; 
 ; Returns: None
 ;----------------------------------------------------------------------------------------------------
@@ -459,28 +463,38 @@ FindSum		Proc
   mov	edx, 0
   mov	edi, [ebp + 8]			; Move the first element of the array.
   mov	ecx, [ebp + 12]			; The count
-  
+ 
+; -----------------------------------
+; This is the loop that will add up all of the integers in the array.
+; It will continually add the next number to the running total and then
+; move to the next item in the array.
+
+; -----------------------------------
   _addNums:
-  mov	eax, [edi]
-  add	edx, eax
-  add	edi, 4
+  mov	eax, [edi]				; Move the number to eax.
+  add	edx, eax				; Add eax to the total.
+  add	edi, 4					; Move to the next integer in the array.
   loop	_addNums
   mov	eax, 0
   mov	eax, [ebp + 20]			; Where the sum is stored
-  mov	[eax], edx				; the total was stored in edx now moving to sdword.	
+  mov	[eax], edx				; The total was stored in edx now moving to sdword.	
 
-  ; display the sum.
+; -----------------------------------
+; This is where the sum of the numbers is displayed. WriteVal is called. The string
+; to say this is the sum is passed to it as well as the integer. It will convert the integer
+; into a string and display it.
 
-  mov	edi, [ebp + 16]
-  mov	esi, [ebp + 20]
-  push	ecx
-  push	edi
+; -----------------------------------
+  mov	edi, [ebp + 16]			; The string that will be displayed.
+  mov	esi, [ebp + 20]			; The sum of the integers.
+  push	ecx						; Saves the count for the array length.
+  push	edi						; Saved where the string is stored.
   call	writeVal
-  pop	edi
-  pop	ecx
+  pop	edi						; Restores edi.
+  pop	ecx						; Restores ecx.
 
 
-  popad
+  popad							; Restores all the registers.
   pop	EBP						; Restore EBP.
   RET	20						; Change this value to however much is pushed onto the stack before the procedure is called.
 
@@ -491,15 +505,18 @@ FindSum		ENDP
 ;----------------------------------------------------------------------------------------------------
 ; Name: FindAverage
 ;
-; Displays the introduction 
+; Finds the average of all the entered numbers. It will then print the average by converting the integer into a string using WriteVal.
 ;
 ; Preconditions: The only preconditions are that the variables need to be pushed onto the stack in
 ; the correct order.
 ;
-; Postconditions: EDX changed.
+; Postconditions: All registers are restored.
 ;
 ; Receives: 
-;	
+;	numAverage		= [ebp + 20] - Where the average is stored.
+;	asciiArray		= [ebp + 16] - Where the integer once converted is saved.
+;	numSum			= [ebp + 12] - The sum of all the integers.
+;	averageString	= [ebp + 8]  - String to be printed saying this is the average.
 ; 
 ; Returns: None
 ;----------------------------------------------------------------------------------------------------
@@ -509,38 +526,40 @@ FindAverage		Proc
   mov	EBP, ESP				; Assign static stack-fram pointer.
   pushad
 
-  mDisplayString [ebp + 8]
+  mDisplayString [ebp + 8]		; Displaying the string this is the average.
 
-  mov	edx, [ebp + 12]
-  mov	eax, [edx]
-  mov	esi, 10	
+; -----------------------------------
+; This where the average is calculated. It takes the sum of the integers
+; and it divides it by 10.
+
+; -----------------------------------
+  mov	edx, [ebp + 12]			; Moves the sum location.
+  mov	eax, [edx]				; Moves the integer into edx.
+  mov	esi, 10					; Moves 10 to esi.
   cdq
-  idiv	esi
-  imul	edx, 2
-  cmp	edx, eax
-  ;jge	_addOne
-  jmp	_dontAdd
+  idiv	esi						; Divides the sum by 10.
+  jmp	_store
 
-  _addone:
-  add	eax, 1
+  _store:
   mov	edx, [ebp + 20]			; Where the average is stored
-  mov	[edx], eax
-  jmp	_print
+  mov	[edx], eax				; Moves the average to storage.
 
-  _dontAdd:
-  mov	edx, [ebp + 20]			; Where the average is stored
-  mov	[edx], eax
+; -----------------------------------
+; This is where the average of the numbers is displayed. WriteVal is called. The string
+; to say this is the average is passed to it as well as the integer. It will convert the integer
+; into a string and display it.
 
+; -----------------------------------
   _print:
-  mov	edi, [ebp + 16]
-  mov	esi, [ebp + 20]
-  push	ecx
-  push	edi
+  mov	edi, [ebp + 16]			; The string to display.
+  mov	esi, [ebp + 20]			; The average.
+  push	ecx						; Saves ecx.
+  push	edi						; Saves edi.
   call	writeVal
-  pop	edi
-  pop	ecx
+  pop	edi						; Restores edi.
+  pop	ecx						; Restores ecx.
 
-  popad
+  popad							; Restores all the registers.
   pop	EBP						; Restore EBP.
   RET	16						; Change this value to however much is pushed onto the stack before the procedure is called.
 
