@@ -204,12 +204,13 @@ Intro	Proc
   mov	EBP, ESP				; Assign static stack-fram pointer.
   pushad
 
-  mDisplayString [ebp+8]			; Prints intro1.
+  mDisplayString [ebp+8]		; Prints intro1.
 
   popad
   pop	EBP						; Restore EBP.
-  RET	4
+  RET	4						; Cleans up the stack frame.
 Intro	ENDP
+
 
 ;----------------------------------------------------------------------------------------------------
 ; Name: ReadVal
@@ -327,7 +328,7 @@ _invalid:
 
 ; -----------------------------------
 ; At this point it is a valid number string and will be converted to an integer.
-; This is done by continually dividing by 10 and adding 48 to the remainder to 
+; This is done by subtracting 48 from the ascii value and multiplying by 10 to 
 ; get what integer it is. It then will continually add the remainders together.
 
 ; -----------------------------------
@@ -368,7 +369,7 @@ _addToArray:
   popad							; Restoring the registers.
 
   pop	EBP						; Restore EBP.
-  RET	28						; Change this value to however much is pushed onto the stack before the procedure is called.
+  RET	28						; Cleans up the stack frame.
 
 ReadVal		ENDP
 
@@ -379,8 +380,8 @@ ReadVal		ENDP
 ; Prints out the array of numbers. It first converts the integer by calling WriteVal then it prints the string. 
 ; It uses an empty array to store the string and prints it out. This will loop 10 times.
 ;
-; Preconditions: The only preconditions are that the variables need to be pushed onto the stack in
-; the correct order.
+; Preconditions: The only preconditions are that the variables, arrays, and strings need to be pushed onto 
+; the stack in the correct order.
 ;
 ; Postconditions: All registers are restored.
 ;
@@ -429,17 +430,18 @@ PrintArray	Proc
   _end:
   popad							; Restoring the registers.
   pop	EBP						; Restore EBP.
-  RET	20						; Change this value to however much is pushed onto the stack before the procedure is called.
+  RET	20						; Cleans up the stack frame.
   
 PrintArray	ENDP
+
 
 ;----------------------------------------------------------------------------------------------------
 ; Name: FindSum
 ;
 ; Finds the sum of all the entered numbers. It will then print the sum by converting the integer into a string using WriteVal.
 ;
-; Preconditions: The only preconditions are that the variables need to be pushed onto the stack in
-; the correct order.
+; Preconditions: The only preconditions are that the variables, arrays, and strings need to be pushed onto 
+; the stack in the correct order.
 ;
 ; Postconditions: All registers are restored.
 ;
@@ -496,10 +498,9 @@ FindSum		Proc
 
   popad							; Restores all the registers.
   pop	EBP						; Restore EBP.
-  RET	20						; Change this value to however much is pushed onto the stack before the procedure is called.
+  RET	20						; Cleans up the stack frame.
 
 FindSum		ENDP
-
 
 
 ;----------------------------------------------------------------------------------------------------
@@ -507,8 +508,8 @@ FindSum		ENDP
 ;
 ; Finds the average of all the entered numbers. It will then print the average by converting the integer into a string using WriteVal.
 ;
-; Preconditions: The only preconditions are that the variables need to be pushed onto the stack in
-; the correct order.
+; Preconditions: The only preconditions are that the variables, arrays, and strings need to be pushed onto 
+; the stack in the correct order.
 ;
 ; Postconditions: All registers are restored.
 ;
@@ -561,90 +562,110 @@ FindAverage		Proc
 
   popad							; Restores all the registers.
   pop	EBP						; Restore EBP.
-  RET	16						; Change this value to however much is pushed onto the stack before the procedure is called.
+  RET	16						; Cleans up the stack frame.
 
 FindAverage		ENDP
 
 
 ;----------------------------------------------------------------------------------------------------
-; Name: writeVal
+; Name: WriteVal
 ;
-; Displays the introduction 
+; WriteVal takes in an integer from an array and will convert it into a string, store that in an array
+; and then display the string version of the integer. 
 ;
-; Preconditions: The only preconditions are that the variables need to be pushed onto the stack in
-; the correct order.
+; Preconditions: The only preconditions are that the variables, arrays, and strings need to be pushed onto 
+; the stack in the correct order.
 ;
-; Postconditions: EDX changed.
+; Postconditions: All registers are restored.
 ;
 ; Receives: 
-;	
+;	The location of the integer that needs to be converted. 
+;	The location of the array where the ascii value of the integer is stored.
 ; 
-; Returns: None
+; Returns: 
+;	Will store a new ascii value in an array and display that value.
+;	
 ;----------------------------------------------------------------------------------------------------
 WriteVal	Proc
   PUSH	EBP						; Preserve EBP
   mov	EBP, ESP				; Assign static stack-fram pointer.
-  pushad
+  pushad						; Saves all the registers.
   CLD
 
-_letsChangeThisNum:
   mov	eax, [esi]				; Move the value into eax
-  mov	ecx, 1
-_nextNum:
-  cmp	eax, 0
-  jl	_negativeNum
-  mov	ebx, 10
+  mov	ecx, 1					; Count for stosb of how many bytes to display.
+
+; -----------------------------------
+; This is where the integer is changed into a string. This is done by dividing the integer by 10,
+; adding 48 to the remainder, and saving that value.
+
+; -----------------------------------
+_convertNum:
+  cmp	eax, 0					; If the number is less than zero it's negative.
+  jl	_negativeNum	
+  mov	ebx, 10					
   cdq
-  idiv	ebx
+  idiv	ebx						; Dividing the integer by 10.
   add	edx, 48
-  push  edx					; Move the remainder onto the stack
+  push  edx						; Move the remainder onto the stack
   cmp	eax, 0
-  jg	_addFourNum			; Continue converting the next number.
-  jmp	_printNum
+  jg	_addToCount				; Continue converting the next number.
+  jmp	_printNum				; Or if finished jump to printing.
 
-_addFourNum:
+; Moves to the next number and adds one to the count for stosb.
+_addToCount:					
   add	ecx, 1
-  jmp	_nextNum
+  jmp	_convertNum
 
+; -----------------------------------
+; If it's a negative number the value is negated, a negative sign is printed
+; and then jumps to _convertNum to convert the positive value into ascii.
+
+; -----------------------------------
 _negativeNum:
-  neg	eax
+  neg	eax						; Negate the number.
   push	eax
   mov	al, '-'
   call	writeChar
   pop	eax
-  jmp	_nextNum  
+  jmp	_convertNum  
 
+; -----------------------------------
+; This is the section where the ascii value of the number is displayed. It takes
+; the value from the array and writes it to the array, then moves to the next value
+; in the array and stores that. Then it prints the whole ascii value.
+
+; -----------------------------------
 _printNum:
-  pop	eax
+  pop	eax						; Pops the remainder which is the ascii value of the number.
+  stosb							; Stores the bytes.
+  mov	edx, [ebp + 8]			; Moves to the next number.
+  loop	_printNum				; Continues doing this for all the bytes.
+  mov	eax, 0					; The null terminator.
   stosb
-  mov	edx, eax
-  mov	edx, [ebp + 8]
-  loop	_printNum
-  mov	eax, 0
-  stosb
-  mDisplayString edx
+  mDisplayString edx			; Displays the ascii value of the number.
   mov	eax, 0
   stosb
 
-  popad
+  popad							; Restores the registers.
   pop	EBP						; Restore EBP.
-  RET							; Every time I try and add a number here it messes up the rest of the program.
+  RET							; The stack frame is cleaned before. If I change this it breaks the program.
   
 WriteVal	ENDP
 
 
 ;----------------------------------------------------------------------------------------------------
-; Name: FindAverage
+; Name: Ending
 ;
-; Displays the introduction 
+; Displays the goodbye message. 
 ;
 ; Preconditions: The only preconditions are that the variables need to be pushed onto the stack in
 ; the correct order.
 ;
-; Postconditions: EDX changed.
+; Postconditions: All registers are restored.
 ;
 ; Receives: 
-;	
+;	ending = [ebp + 8] - The goodbye message.
 ; 
 ; Returns: None
 ;----------------------------------------------------------------------------------------------------
@@ -653,13 +674,13 @@ Ending		PROC
 
   PUSH	EBP						; Preserve EBP
   mov	EBP, ESP				; Assign static stack-fram pointer.
-  pushad
+  pushad						; Saves the registers.
 
-  mDisplayString [ebp+8]			; Prints ending.
+  mDisplayString [ebp+8]		; Prints ending.
 
-  popad
+  popad							; Restores the registers.
   pop	EBP						; Restore EBP.
-  RET	4
+  RET	4						; Cleans up the stack frame.
 
 Ending		ENDP
 
