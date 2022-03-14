@@ -13,23 +13,31 @@ INCLUDE Irvine32.inc
 ;----------------------------------------------------------------------------------------------------
 ; Name: mGetString
 ;
-; Generates 
+; Will prompt a user to enter a number. Then it will read that number as a string and store it along
+; with the bytes read.
 ;
-; Preconditions: 
+; Preconditions: Must pass the prompt, the buffer size, the location where the string will be saved,
+; and a location for where the bytes read will be saved.
 ;
 ; Receives: 
+;	numPrompt	= The string that will be printed to prompt the user to enter a string.
+;	count		= The buffer size of the string.
+;	numEntered	= The location where the entered string will be saved.
+;	byteRead	= The location where the bytes read will be saved.
 ; 
-; Returns: None
+; Returns: 
+;	numEntered	= The string that was entered.
+;	byteRead	= The amount of bytes read.
 ;----------------------------------------------------------------------------------------------------
   mGetString macro numPrompt, count, numEntered, byteRead
 	push	edx
-	mov		edx, numPrompt
+	mov		edx, numPrompt			; Move the prompt into edx and display it.
 	call	WriteString
-	mov		edx, numEntered
-	mov		ecx, count
-	call	ReadString
-	mov		[numEntered], edx
-	mov		[byteRead], EAX
+	mov		edx, numEntered			; Move the location of numEntered into edx.
+	mov		ecx, count				; Move the location of the count into ecx.
+	call	ReadString				; Read what the user entered.
+	mov		[numEntered], edx		; Save the user entered string into the location numEntered.
+	mov		[byteRead], EAX			; Move the bytes read into the location byteRead.
 	pop		edx
   
 ENDM
@@ -37,17 +45,18 @@ ENDM
 ;----------------------------------------------------------------------------------------------------
 ; Name: mDisplayString
 ;
-; Generates
+; Will print out a string.
 ;
-; Preconditions: 
+; Preconditions: Must pass the prompt.
 ;
 ; Receives: 
+;	string	=	The string that will be printed.
 ; 
 ; Returns: None
 ;----------------------------------------------------------------------------------------------------
   mDisplayString macro string
 	push	EDX
-	mov		EDX, string
+	mov		EDX, string					
 	call	WriteString					; Prints whatever string is passed to it.
 	pop		EDX
   ENDM
@@ -80,10 +89,9 @@ ENDM
   buffer			byte	21 DUP (0)
   bytesRead			sdword	?
   inString			byte	CHARACTERSIZE dup(?)
-
   enteredNum		sdword	?
   arrayPosition		sdword	0
-  count				sDWORD   LENGTHOF numArray  ; debugging purposes
+  count				sDWORD  LENGTHOF numArray  
   numSum			sdword	?
   numAverage		sdword	?
   lengthAscii		sdword	LENGTHOF  asciiArray
@@ -100,7 +108,13 @@ main PROC
   push	offset intro1
   call	Intro
 
-  ; Asking the user for the numbers and storing them.
+; -----------------------------------
+; Asks the user for 10 numbers. The numbers are entered as strings
+; and then are converted to integers. Before converting it will 
+; check to see if the number is valid and in the correct range.
+; Then it will store the integer in an array.
+
+; -----------------------------------
   mov	ecx, 10
 _getNumLoop:
   push	arrayPosition
@@ -109,35 +123,53 @@ _getNumLoop:
   push	offset	bytesRead
   push	offset	inString
   push	offset	enterNum
-  call	ReadVal
-  add	arrayPosition, 4
-  loop _getNumLoop
+  call	ReadVal						; Calling ReadVal to retrieve and store the numbers.
+  add	arrayPosition, 4			; Moving to the next array value.
+  loop _getNumLoop					; This needs to be looped 10 times to get 10 values.
 
   call	crlf
 
+
+; -----------------------------------
+; Prints out the array of numbers. It first converts the integer
+; by calling WriteVal then it prints the string. It uses and empty array 
+; to store the string and prints it out. This will loop 10 times in the 
+; procedure.
+
+; -----------------------------------
   ;printing out the array.
   push	count
-  push	offset	asciiArray
-  push	offset	numArray
-  push	offset	enteredNums
+  push	offset	asciiArray			; Where the string is stored.
+  push	offset	numArray			; The integers that were entered.
+  push	offset	enteredNums			; String to display.
   call	PrintArray
   
   call	crlf
-  ;Finding the sum and printing it.
-  push	offset	sumString
-  push	offset	numSum
+
+; -----------------------------------
+; Finds the sum of all the entered numbers. It will then print the sum
+; by converting the integer into a string using WriteVal.
+
+; -----------------------------------
+  push	offset	sumString			; String to be printed saying this is the sum.
+  push	offset	numSum				; Where the sum is stored.
   push	offset	asciiArray
-  push	count
-  push	offset	numArray
+  push	count						; Length of the array for loop.
+  push	offset	numArray			; The array of integers.
   call  FindSum
 
   call	crlf
 
-  ; Find the average and printing it.
-  push	offset	numAverage
+
+; -----------------------------------
+; Finds the average of all the entered numbers. It will then print the sum
+; by converting the integer into a string using WriteVal.
+
+; -----------------------------------
+  push	offset	numAverage			; Where the average is stored.
   push	offset	asciiArray
   push	offset	numSum
-  push	offset	averageString
+  push	offset	averageString		; String to be printed saying this is the average.
   call	FindAverage
 
   call	crlf
@@ -180,24 +212,30 @@ Intro	Proc
 Intro	ENDP
 
 ;----------------------------------------------------------------------------------------------------
-; Name: intro
+; Name: ReadVal
 ;
-; Displays the introduction 
+; Asks the user for 10 numbers. The numbers are entered as strings and then are converted to integers.  
+; Before converting it will check to see if the number is valid and in the correct range.
+; Then it will store the integer in an array.
 ;
-; Preconditions: The only preconditions are that the variables need to be pushed onto the stack in
-; the correct order.
+; Preconditions: The only preconditions are that the variables, arrays, and strings need to be pushed onto 
+; the stack in the correct order.
 ;
-; Postconditions: EDX changed.
+; Postconditions: All registers are restored.
 ;
-; Receives: 
-;  arrayPosition
-;  numArray
-;  wrongNum
-;  bytesRead
-;  inString
-;  enterNum
+; Receives: Some of these are global variables but are first pushed onto the stack. So they are only refereced.
+;  arrayPosition	= [ebp + 28] - The position in the array that is being filled.
+;  numArray			= [ebp + 24] - The array where the integer is stored.
+;  wrongNum			= [ebp + 20] - The string for when a wrong number is entered.
+;  bytesRead		= [ebp + 16] - The amount of bytes read during the mGetString macro.
+;  inString			= [ebp + 12] - Where the number, as a string, is stored that was entered by the user.
+;  enterNum			= [ebp + 12] - The prompt to ask the user to enter a number.
 ; 
-; Returns: None
+; Returns: 
+;  numArray			= [ebp + 24] - The array will have an integer added to it.
+;  bytesRead		= [ebp + 16] - The amount of bytes read during the mGetString macro will be saved.
+;  inString			= [ebp + 12] - Where the number, as a string, is stored that was entered by the user.
+;  
 ;----------------------------------------------------------------------------------------------------
 ReadVal	Proc
   PUSH	EBP						; Preserve EBP
