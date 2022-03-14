@@ -1,4 +1,4 @@
-Microsoft (R) Macro Assembler Version 14.29.30138.0	    03/13/22 21:14:20
+Microsoft (R) Macro Assembler Version 14.29.30138.0	    03/13/22 21:24:34
 "Project 6     (Proj6_pruittad.asm			     Page 1 - 1
 
 
@@ -83,18 +83,17 @@ Microsoft (R) Macro Assembler Version 14.29.30138.0	    03/13/22 21:14:20
 				  ENDM
 
 
-				; (insert constant definitions here)
- = 0000000A			  ARRAYSIZE = 10
- = 00000014			  CHARACTERSIZE	= 20
- = 00000014			  ASCIIARRAYSIZE = 20
+ = 0000000A			  ARRAYSIZE = 10						; Constant for the array size.
+ = 00000014			  CHARACTERSIZE	= 20					; Constant for the string inputed.
+ = 00000014			  ASCIIARRAYSIZE = 20					; Constant for the arcii array size.
 				  
 
  00000000			.data
 				 
- 00000000  0000000A [		  numArray			sdword	ARRAYSIZE DUP(?)
+ 00000000  0000000A [		  numArray			sdword	ARRAYSIZE DUP(?)					; Integer array.
 	    00000000
 	   ]
- 00000028  00000014 [		  asciiArray		byte	ASCIIARRAYSIZE DUP(?)
+ 00000028  00000014 [		  asciiArray		byte	ASCIIARRAYSIZE DUP(?)				; Ascii array.
 	    00
 	   ]
 
@@ -216,24 +215,18 @@ Microsoft (R) Macro Assembler Version 14.29.30138.0	    03/13/22 21:14:20
 	   20 70 6C 61 79
 	   69 6E 67 21 0D
 	   0A 00
- 00000275 00000000		  stringLen			sdword	?	
- 00000279  00000015 [		  buffer			byte	21 DUP (0)
+ 00000275  00000015 [		  buffer			byte	21 DUP (0)
 	    00
 	   ]
- 0000028E 00000000		  bytesRead			sdword	?
- 00000292  00000014 [		  inString			byte	CHARACTERSIZE dup(?)
+ 0000028A 00000000		  bytesRead			sdword	?							
+ 0000028E  00000014 [		  inString			byte	CHARACTERSIZE dup(?)
 	    00
 	   ]
- 000002A6 00000000		  enteredNum		sdword	?
- 000002AA 00000000		  arrayPosition		sdword	0
- 000002AE 0000000A		  count				sDWORD  LENGTHOF numArray  
- 000002B2 00000000		  numSum			sdword	?
- 000002B6 00000000		  numAverage		sdword	?
- 000002BA 00000014		  lengthAscii		sdword	LENGTHOF  asciiArray
-
-
-				  
-
+ 000002A2 00000000		  arrayPosition		sdword	0
+ 000002A6 0000000A		  count				sDWORD  LENGTHOF numArray  
+ 000002AA 00000000		  numSum			sdword	?									; Where the sum is stored.
+ 000002AE 00000000		  numAverage		sdword	?									; Where the average is stored.
+ 000002B2 00000014		  lengthAscii		sdword	LENGTHOF  asciiArray
 
 
  00000000			.code
@@ -252,14 +245,14 @@ Microsoft (R) Macro Assembler Version 14.29.30138.0	    03/13/22 21:14:20
 				; -----------------------------------
  0000000A  B9 0000000A		  mov	ecx, 10
  0000000F			_getNumLoop:
- 0000000F  FF 35 000002AA R	  push	arrayPosition
+ 0000000F  FF 35 000002A2 R	  push	arrayPosition
  00000015  68 00000000 R	  push	offset	numArray
  0000001A  68 000001A8 R	  push	offset	wrongNum
- 0000001F  68 0000028E R	  push	offset	bytesRead
- 00000024  68 00000292 R	  push	offset	inString
+ 0000001F  68 0000028A R	  push	offset	bytesRead
+ 00000024  68 0000028E R	  push	offset	inString
  00000029  68 00000189 R	  push	offset	enterNum
  0000002E  E8 00000098		  call	ReadVal						; Calling ReadVal to retrieve and store the numbers.
- 00000033  83 05 000002AA R	  add	arrayPosition, 4			; Moving to the next array value.
+ 00000033  83 05 000002A2 R	  add	arrayPosition, 4			; Moving to the next array value.
 	   04
  0000003A  E2 D3		  loop _getNumLoop					; This needs to be looped 10 times to get 10 values.
 
@@ -274,7 +267,7 @@ Microsoft (R) Macro Assembler Version 14.29.30138.0	    03/13/22 21:14:20
 
 				; -----------------------------------
 				  ;printing out the array.
- 00000041  FF 35 000002AE R	  push	count
+ 00000041  FF 35 000002A6 R	  push	count
  00000047  68 00000028 R	  push	offset	asciiArray			; Where the string is stored.
  0000004C  68 00000000 R	  push	offset	numArray			; The integers that were entered.
  00000051  68 00000201 R	  push	offset	enteredNums			; String to display.
@@ -288,9 +281,9 @@ Microsoft (R) Macro Assembler Version 14.29.30138.0	    03/13/22 21:14:20
 
 				; -----------------------------------
  00000060  68 00000227 R	  push	offset	sumString			; String to be printed saying this is the sum.
- 00000065  68 000002B2 R	  push	offset	numSum				; Where the sum is stored.
+ 00000065  68 000002AA R	  push	offset	numSum				; Where the sum is stored.
  0000006A  68 00000028 R	  push	offset	asciiArray
- 0000006F  FF 35 000002AE R	  push	count						; Length of the array for loop.
+ 0000006F  FF 35 000002A6 R	  push	count						; Length of the array for loop.
  00000075  68 00000000 R	  push	offset	numArray			; The array of integers.
  0000007A  E8 0000015C		  call  FindSum
 
@@ -302,9 +295,9 @@ Microsoft (R) Macro Assembler Version 14.29.30138.0	    03/13/22 21:14:20
 				; by converting the integer into a string using WriteVal.
 
 				; -----------------------------------
- 00000084  68 000002B6 R	  push	offset	numAverage			; Where the average is stored.
+ 00000084  68 000002AE R	  push	offset	numAverage			; Where the average is stored.
  00000089  68 00000028 R	  push	offset	asciiArray
- 0000008E  68 000002B2 R	  push	offset	numSum
+ 0000008E  68 000002AA R	  push	offset	numSum
  00000093  68 00000244 R	  push	offset	averageString		; String to be printed saying this is the average.
  00000098  E8 0000017E		  call	FindAverage
 
@@ -866,7 +859,7 @@ Microsoft (R) Macro Assembler Version 14.29.30138.0	    03/13/22 21:14:20
 
 				END main
 
-Microsoft (R) Macro Assembler Version 14.29.30138.0	    03/13/22 21:14:20
+Microsoft (R) Macro Assembler Version 14.29.30138.0	    03/13/22 21:24:34
 "Project 6     (Proj6_pruittad.asm			     Symbols 2 - 1
 
 
@@ -968,7 +961,7 @@ Segments and Groups:
 
 FLAT . . . . . . . . . . . . . .	GROUP
 STACK  . . . . . . . . . . . . .	32 Bit	 00001000 Para	  Stack	  'STACK'	 
-_DATA  . . . . . . . . . . . . .	32 Bit	 000002BE Para	  Public  'DATA'	
+_DATA  . . . . . . . . . . . . .	32 Bit	 000002B6 Para	  Public  'DATA'	
 _TEXT  . . . . . . . . . . . . .	32 Bit	 000002B9 Para	  Public  'CODE'	
 
 
@@ -1323,26 +1316,25 @@ VK_UP  . . . . . . . . . . . . .	Number	 00000026h
 WINDOW_BUFFER_SIZE_EVENT . . . .	Number	 00000004h   
 WriteConsoleOutputCharacter  . .	Text   	 WriteConsoleOutputCharacterA
 WriteConsole . . . . . . . . . .	Text   	 WriteConsoleA
-arrayPosition  . . . . . . . . .	DWord	 000002AA _DATA	
+arrayPosition  . . . . . . . . .	DWord	 000002A2 _DATA	
 asciiArray . . . . . . . . . . .	Byte	 00000028 _DATA	
 averageString  . . . . . . . . .	Byte	 00000244 _DATA	
 black  . . . . . . . . . . . . .	Number	 00000000h   
 blue . . . . . . . . . . . . . .	Number	 00000001h   
 brown  . . . . . . . . . . . . .	Number	 00000006h   
-buffer . . . . . . . . . . . . .	Byte	 00000279 _DATA	
-bytesRead  . . . . . . . . . . .	DWord	 0000028E _DATA	
-count  . . . . . . . . . . . . .	DWord	 000002AE _DATA	
+buffer . . . . . . . . . . . . .	Byte	 00000275 _DATA	
+bytesRead  . . . . . . . . . . .	DWord	 0000028A _DATA	
+count  . . . . . . . . . . . . .	DWord	 000002A6 _DATA	
 cyan . . . . . . . . . . . . . .	Number	 00000003h   
 enterNum . . . . . . . . . . . .	Byte	 00000189 _DATA	
 enteredNums  . . . . . . . . . .	Byte	 00000201 _DATA	
-enteredNum . . . . . . . . . . .	DWord	 000002A6 _DATA	
 exit . . . . . . . . . . . . . .	Text   	 INVOKE ExitProcess,0
 goodbye  . . . . . . . . . . . .	Byte	 0000025F _DATA	
 gray . . . . . . . . . . . . . .	Number	 00000008h   
 green  . . . . . . . . . . . . .	Number	 00000002h   
-inString . . . . . . . . . . . .	Byte	 00000292 _DATA	
+inString . . . . . . . . . . . .	Byte	 0000028E _DATA	
 intro1 . . . . . . . . . . . . .	Byte	 0000003C _DATA	
-lengthAscii  . . . . . . . . . .	DWord	 000002BA _DATA	
+lengthAscii  . . . . . . . . . .	DWord	 000002B2 _DATA	
 lightBlue  . . . . . . . . . . .	Number	 00000009h   
 lightCyan  . . . . . . . . . . .	Number	 0000000Bh   
 lightGray  . . . . . . . . . . .	Number	 00000007h   
@@ -1351,10 +1343,9 @@ lightMagenta . . . . . . . . . .	Number	 0000000Dh
 lightRed . . . . . . . . . . . .	Number	 0000000Ch   
 magenta  . . . . . . . . . . . .	Number	 00000005h   
 numArray . . . . . . . . . . . .	DWord	 00000000 _DATA	
-numAverage . . . . . . . . . . .	DWord	 000002B6 _DATA	
-numSum . . . . . . . . . . . . .	DWord	 000002B2 _DATA	
+numAverage . . . . . . . . . . .	DWord	 000002AE _DATA	
+numSum . . . . . . . . . . . . .	DWord	 000002AA _DATA	
 red  . . . . . . . . . . . . . .	Number	 00000004h   
-stringLen  . . . . . . . . . . .	DWord	 00000275 _DATA	
 sumString  . . . . . . . . . . .	Byte	 00000227 _DATA	
 white  . . . . . . . . . . . . .	Number	 0000000Fh   
 wrongNum . . . . . . . . . . . .	Byte	 000001A8 _DATA	

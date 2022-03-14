@@ -62,16 +62,15 @@ ENDM
   ENDM
 
 
-; (insert constant definitions here)
-  ARRAYSIZE = 10
-  CHARACTERSIZE	= 20
-  ASCIIARRAYSIZE = 20
+  ARRAYSIZE = 10						; Constant for the array size.
+  CHARACTERSIZE	= 20					; Constant for the string inputed.
+  ASCIIARRAYSIZE = 20					; Constant for the arcii array size.
   
 
 .data
  
-  numArray			sdword	ARRAYSIZE DUP(?)
-  asciiArray		byte	ASCIIARRAYSIZE DUP(?)
+  numArray			sdword	ARRAYSIZE DUP(?)					; Integer array.
+  asciiArray		byte	ASCIIARRAYSIZE DUP(?)				; Ascii array.
 
   intro1			byte	"PROGRAMMING ASSIGNMENT 6: Designing low-level I/O procedures", 13, 10
 					byte	"Written by: Adam Pruitt", 13, 10, 13, 10
@@ -85,20 +84,14 @@ ENDM
   sumString			byte	"The sum of thse numbers is: ", 0
   averageString		byte	"The truncated average is: ", 0
   goodbye			byte	"Thanks for playing!", 13,10,0
-  stringLen			sdword	?	
   buffer			byte	21 DUP (0)
-  bytesRead			sdword	?
+  bytesRead			sdword	?							
   inString			byte	CHARACTERSIZE dup(?)
-  enteredNum		sdword	?
   arrayPosition		sdword	0
   count				sDWORD  LENGTHOF numArray  
-  numSum			sdword	?
-  numAverage		sdword	?
+  numSum			sdword	?									; Where the sum is stored.
+  numAverage		sdword	?									; Where the average is stored.
   lengthAscii		sdword	LENGTHOF  asciiArray
-
-
-  
-
 
 
 .code
